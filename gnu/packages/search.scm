@@ -14,6 +14,7 @@
 ;;; Copyright © 2022 Michael Rohleder <mike@rohleder.de>
 ;;; Copyright © 2023 Adam Faiz <adam.faiz@disroot.org>
 ;;; Copyright © 2023 David Pflug <david@pflug.io>
+;;; Copyright © 2023 Ryan Sundberg <ryan@arctype.co>
 ;;; Copyright © 2024 Ashish SHUKLA <ashish.is@lostca.se>
 ;;;
 ;;; This file is part of GNU Guix.
@@ -38,6 +39,7 @@
   #:use-module (guix git-download)
   #:use-module (guix gexp)
   #:use-module (guix utils)
+  #:use-module (guix build-system copy)
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system perl)
   #:use-module (guix build-system python)
@@ -78,6 +80,32 @@
   #:use-module (gnu packages xdisorg)
   #:use-module (gnu packages xml)
   #:use-module (gnu packages pkg-config))
+
+(define-public ack
+  (package
+    (name "ack")
+    (version "3.5.0")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (string-append "https://beyondgrep.com/ack-v" version))
+        (sha256 (base32 "17wq9c1pwisbg4mcmvmdaym8hlawx209iriaxjlw9hwi0v4x6w38"))))
+    (inputs `(("perl" ,perl)))
+    (build-system copy-build-system)
+    (arguments
+      `(#:install-plan '(("ack" "bin/ack"))
+        #:phases
+        (modify-phases %standard-phases
+          (replace 'unpack
+                   (lambda* (#:key source #:allow-other-keys)
+                     (copy-file source "ack")
+                     (chmod "ack" #o0755)
+                     #t)))))
+    (home-page "https://beyondgrep.com/")
+    (synopsis "Grep-like source code search tool")
+    (description "Ack is designed for programmers with large heterogeneous trees of
+source code, as an alternative to grep.")
+    (license license:artistic2.0)))
 
 (define-public xapian
   (package
