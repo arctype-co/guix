@@ -315,14 +315,15 @@ and provides a \"top-like\" mode (monitoring).")
 (define-public shepherd-0.8
   (package
     (name "shepherd")
-    (version "0.8.1")
+    (version "master-20210501")
     (source (origin
-              (method url-fetch)
-              (uri (string-append "mirror://gnu/shepherd/shepherd-"
-                                  version ".tar.gz"))
+              (method git-fetch)
+              (uri (git-reference
+                     (url "git://git.savannah.gnu.org/shepherd.git")
+                     (commit "4c5176f5a7a5a1e7d7f258f585e8ed127a21b99a")))
               (sha256
                (base32
-                "0x9zr0x3xvk4qkb6jnda451d5iyrl06cz1bjzjsm0lxvjj3fabyk"))
+                "0x7njnvhxmay4xz4pyh9b982bhxys089nysz95paz3vhf1253fr6"))
               (modules '((guix build utils)))
               (snippet
                '(begin
@@ -333,11 +334,25 @@ and provides a \"top-like\" mode (monitoring).")
     (build-system gnu-build-system)
     (arguments
      '(#:configure-flags '("--localstatedir=/var")
-       #:make-flags '("GUILE_AUTO_COMPILE=0")))
+       #:make-flags '("GUILE_AUTO_COMPILE=0")
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'fix-permissions
+           (lambda  _
+             (for-each
+               (lambda (po-file) (chmod po-file #o644))
+               (find-files "." "\\.po$"))
+             #t)))))
     (native-inputs
      (list pkg-config
            ;; This is the Guile we use as a cross-compiler...
-           guile-3.0))
+           guile-3.0
+           autoconf
+           automake
+           gnu-gettext
+           help2man
+           info-reader
+           texi2html))
     (inputs
      ;; ... and this is the one that appears in shebangs when cross-compiling.
      (list guile-3.0
