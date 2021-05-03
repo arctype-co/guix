@@ -5513,6 +5513,14 @@ code introspection, and logging.")
   (package
     (inherit python-pbr-minimal)
     (name "python-pbr")
+    (version "5.6.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "pbr" version))
+       (sha256
+        (base32
+         "1p8hhyrvbax131w7sjpjgpyk8z4w4w009702n4jncybvg7kh7ps2"))))
     (arguments
      `(#:tests? #f)) ;; Most tests seem to use the Internet.
     (propagated-inputs
