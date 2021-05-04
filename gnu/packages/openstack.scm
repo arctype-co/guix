@@ -45,6 +45,7 @@
   #:use-module (gnu packages xml)
   #:use-module (guix build-system python)
   #:use-module (guix download)
+  #:use-module (guix gexp)
   #:use-module ((guix licenses)
                 #:select (asl2.0))
   #:use-module (guix packages)
@@ -194,25 +195,40 @@ Google mox framework} to Python 3.  It was meant to be as compatible
 with mox as possible, but small enhancements have been made.")
     (license asl2.0)))
 
+(define python-openstackdocstheme-requirements-patch
+  ; Remove maximum versions
+  (plain-file "requirements.patch"
+"diff --git a/test-requirements.txt b/test-requirements.txt
+index dbb099e..be1491c 100644
+--- a/test-requirements.txt
++++ b/test-requirements.txt
+@@ -2,7 +2,7 @@
+ # of appearance. Changing the order has an impact on the overall integration
+ # process, which may cause wedges in the gate later.
+
+-hacking>=3.0.1,<3.1.0 # Apache-2.0
++hacking>=3.0.1 # Apache-2.0
+
+ # this is required for the docs build jobs
+ sphinx>=2.0.0,!=2.1.0 # BSD
+"))
+
 (define-public python-openstackdocstheme
   (package
     (name "python-openstackdocstheme")
-    (version "1.18.1")
+    (version "2.2.7")
     (source (origin
               (method url-fetch)
               (uri (pypi-uri "openstackdocstheme" version))
               (sha256
                (base32
-                "1ki5204rjdqjvr8xr9w2qc1z6b6d2i5jas0i70xzkf9njlzjzv2r"))))
+                "0wk3pw2gwwidjwwbc2c6f7szm65mvqfcx2p4q4rwfdvk4w0grb5y"))
+              (patches (list python-openstackdocstheme-requirements-patch))))
     (build-system python-build-system)
-    (arguments
-     ;; FIXME: Tests require an old version of python-hacking, which in
-     ;; turn depends on mox3 which depends on this package.
-     `(#:tests? #f))
     (propagated-inputs
-     (list python-dulwich python-pbr))
+     (list python-dulwich python-hacking python-pbr))
     (native-inputs
-     (list python-sphinx))
+     (list python-pre-commit python-sphinx))
     (home-page "https://docs.openstack.org/openstackdocstheme/latest/")
     (synopsis "OpenStack Docs Theme")
     (description
