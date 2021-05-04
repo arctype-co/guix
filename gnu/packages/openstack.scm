@@ -672,13 +672,13 @@ in transmittable and storable formats, such as JSON and MessagePack.")
 (define-public python-reno
   (package
     (name "python-reno")
-    (version "2.7.0")
+    (version "3.3.0")
     (source
       (origin
         (method url-fetch)
         (uri (pypi-uri "reno" version))
         (sha256
-          (base32 "0gwzi5dvacqx43smxl3rd1z33npn7gfhm50bvgmq90fib2q431wc"))))
+          (base32 "0mba3vnpqc0y02b668963xp75vdx9al6g0l2nna49r8rcvv7z19x"))))
     (build-system python-build-system)
     (arguments
      `(#:phases
@@ -688,16 +688,18 @@ in transmittable and storable formats, such as JSON and MessagePack.")
              ;; reno expects a git repo
              (invoke "git" "init"))))))
     (propagated-inputs
-      (list python-dulwich python-pbr python-pyyaml python-six))
+      (list python-dulwich python-packaging python-pbr python-pyyaml))
     (native-inputs
-      `(("python-testtools" ,python-testtools)
-        ("python-testscenarios" ,python-testscenarios)
-        ("python-testrepository" ,python-testrepository)
-        ("python-mock" ,python-mock)
-        ("python-docutils" ,python-docutils)
-        ("python-sphinx" ,python-sphinx)
-        ("gnupg" ,gnupg)
-        ("git" ,git-minimal)))
+      (list git-minimal
+            gnupg
+            python-coverage
+            python-docutils
+            python-openstackdocstheme
+            python-sphinx
+            python-stestr
+            python-subunit
+            python-testscenarios
+            python-testtools))
     (home-page "https://docs.openstack.org/reno/latest/")
     (synopsis "Release notes manager")
     (description "Reno is a tool for storing release notes in a git repository
