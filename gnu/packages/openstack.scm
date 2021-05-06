@@ -580,14 +580,14 @@ pipeline and used by various modules such as logging.")
 (define-public python-oslo.i18n
   (package
     (name "python-oslo.i18n")
-    (version "3.20.0")
+    (version "5.0.1")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "oslo.i18n" version))
        (sha256
         (base32
-         "0kjcdw4bk3mi4vqmqwhhq053kxbbbj05si6nwxd1pzx33z067ky3"))))
+         "0nq3dr2kbrawqvp9q9i8i44z9jliq98i2b9h4dsl6p7p60gbg11l"))))
     (build-system python-build-system)
     (arguments
      '(#:tests? #f))                 ;avoid circular dependency on oslo.config
