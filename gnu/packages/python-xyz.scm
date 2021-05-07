@@ -14932,6 +14932,29 @@ These should be used in preference to using a backslash for line continuation.
 and @code{InteractiveShellEmbed()()}.")
     (license license:expat)))
 
+(define-public python-flake8-docstrings
+  (package
+    (name "python-flake8-docstrings")
+    (version "1.6.0")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "flake8-docstrings" version))
+        (sha256
+          (base32
+            "0jy3i9q57kl45gpwlfdvhigsa7gbx5hjyp055bkghjh60siwdrwz"))))
+    (build-system python-build-system)
+    (propagated-inputs
+      `(("python-flake8" ,python-flake8)
+        ("python-pydocstyle" ,python-pydocstyle)))
+    (home-page
+      "https://gitlab.com/pycqa/flake8-docstrings")
+    (synopsis
+      "Extension for flake8 which uses pydocstyle to check docstrings")
+    (description
+      "Extension for flake8 which uses pydocstyle to check docstrings")
+    (license license:expat)))
+
 (define-public python-flake8-implicit-str-concat
   (package
     (name "python-flake8-implicit-str-concat")
