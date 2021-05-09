@@ -26,6 +26,7 @@
 
 (define-module (gnu packages openstack)
   #:use-module (gnu packages)
+  #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages check)
   #:use-module (gnu packages databases)
@@ -864,6 +865,68 @@ and service requests within the OpenStack ecosystem.  It is designed for use
 in conjunction with the existing OpenStack clients and for simplifying the
 process of writing new clients.")
     (license asl2.0)))
+
+(define-public python-keystoneauth1
+  (package
+    (name "python-keystoneauth1")
+    (version "4.3.1")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "keystoneauth1" version))
+        (sha256
+          (base32
+            "0r4ach6adh7z1kq9k378aii9mgn1kmg6iicvclqlyhnilqq58q4k"))
+        ; Remove max versions from requirements
+        (patches (search-patches "python-keystoneauth1-requirements.patch"))))
+    (build-system python-build-system)
+    (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (replace 'check
+                   (lambda _
+                     (invoke "stestr" "run")
+                     #t)))))
+    (propagated-inputs
+      `(("python-iso8601" ,python-iso8601)
+        ("python-os-service-types"
+         ,python-os-service-types)
+        ("python-pbr" ,python-pbr)
+        ("python-requests" ,python-requests)
+        ("python-six" ,python-six)
+        ("python-stevedore" ,python-stevedore)))
+    (native-inputs
+      `(("python-bandit" ,python-bandit)
+        ("python-betamax" ,python-betamax)
+        ("python-coverage" ,python-coverage)
+        ("python-fixtures" ,python-fixtures)
+        ("python-flake8-docstrings"
+         ,python-flake8-docstrings)
+        ("python-flake8-import-order"
+         ,python-flake8-import-order)
+        ("python-hacking" ,python-hacking)
+        ("python-lxml" ,python-lxml)
+        ("python-oauthlib" ,python-oauthlib)
+        ("python-oslo.config" ,python-oslo.config)
+        ("python-oslo.utils" ,python-oslo.utils)
+        ("python-oslotest" ,python-oslotest)
+        ("python-pycodestyle" ,python-pycodestyle)
+        ("python-pyyaml" ,python-pyyaml)
+        ("python-reno" ,python-reno)
+        ("python-requests-kerberos"
+         ,python-requests-kerberos)
+        ("python-requests-mock" ,python-requests-mock)
+        ("python-stestr" ,python-stestr)
+        ("python-testresources" ,python-testresources)
+        ("python-testtools" ,python-testtools)
+        ("which" ,which)))
+    (home-page
+      "https://docs.openstack.org/keystoneauth/latest/")
+    (synopsis
+      "Authentication Library for OpenStack Identity")
+    (description
+      "Authentication Library for OpenStack Identity")
+    (license #f)))
 
 (define-public python-keystoneclient
   (package
