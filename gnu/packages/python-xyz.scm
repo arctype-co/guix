@@ -38016,6 +38016,31 @@ path.")
 Jinja2.")
     (license (list license:gpl3+ license:expat))))
 
+(define-public python-winkerberos
+  (package
+    (name "python-winkerberos")
+    (version "0.8.0")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "winkerberos" version ".zip"))
+        (sha256
+          (base32
+            "1nh45r0h2fnwcg334b0icy05h0l30y0hr5p1vjzy1pyz4xmpgy9a"))))
+    ; This is a windows package. Skip building it and just provide
+    ; the package so the dependency may be resolved.
+    (build-system trivial-build-system)
+    (arguments
+      `(#:builder (begin (mkdir %output) #t)))
+    (native-inputs `(("unzip" ,unzip)))
+    (home-page
+      "https://github.com/mongodb-labs/winkerberos")
+    (synopsis
+      "High level interface to SSPI for Kerberos client auth")
+    (description
+      "High level interface to SSPI for Kerberos client auth")
+    (license license:asl2.0)))
+
 (define-public python-pymonad
   (package
     (name "python-pymonad")
