@@ -14987,6 +14987,34 @@ the same line (which can be introduced by the code formatting tool Black), or
 unnecessary plus operators for explicit string literal concatenation.")
     (license license:expat)))
 
+(define-public python-flake8-import-order
+  (package
+    (name "python-flake8-import-order")
+    (version "0.18.1")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "flake8-import-order" version))
+        (sha256
+          (base32
+            "14kfvsagqc6lrplvf3x58ia6x744bk8fj91wmk0hcipa8naw73d2"))))
+    (build-system python-build-system)
+    (native-inputs
+      `(("python-pytest", python-pytest)
+        ("python-flake8", python-flake8)
+        ("python-pycodestyle", python-pycodestyle)
+        ("python-pylama", python-pylama)))
+    (propagated-inputs
+      `(("python-pycodestyle" ,python-pycodestyle)
+        ("python-setuptools" ,python-setuptools)))
+    (home-page
+      "https://github.com/PyCQA/flake8-import-order")
+    (synopsis
+      "Flake8 and pylama plugin that checks the ordering of import statements.")
+    (description
+      "Flake8 and pylama plugin that checks the ordering of import statements.")
+    (license license:lgpl3)))
+
 (define-public python-flake8-print
   (package
     (name "python-flake8-print")
