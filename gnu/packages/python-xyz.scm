@@ -37435,6 +37435,31 @@ toolkit for Python.")
 composing subtitles in the SRT file format.")
     (license license:expat)))
 
+(define-public python-statsd
+  (package
+    (name "python-statsd")
+    (version "3.3")
+    (source
+      (origin
+        (method git-fetch)
+        (uri
+          (git-reference
+            (url "https://github.com/jsocol/pystatsd.git")
+            (commit (string-append "v" version))))
+        (sha256
+          (base32
+            "1i9mfpq8f9aciqzkkz4irgvz8vs9nwjcfhvrj6ak2cgqchszsiaf"))
+        (patches (search-patches "python-statsd-requirements.patch"))))
+    (build-system python-build-system)
+    (native-inputs
+      `(("python-flake8" ,python-flake8)
+        ("python-mock" ,python-mock)
+        ("python-nose" ,python-nose)))
+    (home-page "https://github.com/jsocol/pystatsd")
+    (synopsis "a simple statsd client.")
+    (description "a simple statsd client.")
+    (license license:expat)))
+
 (define-public python-gatt
   (package
     (name "python-gatt")
