@@ -1016,6 +1016,67 @@ LDAP.")
       "Import exceptions from potentially bundled packages in requests.")
     (license asl2.0)))
 
+(define-public python-openstacksdk
+  (package
+    (name "python-openstacksdk")
+    (version "0.56.0")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "openstacksdk" version))
+        (sha256
+          (base32
+            "0nzn1q93333shwn5fnz69lh6cq0im1d3vwwmkw2yy0snd9s36xlw"))
+        (patches (search-patches "python-openstacksdk-requirements.patch"))))
+    (build-system python-build-system)
+    (arguments
+      `(; Tests are unstable due to timeouts (3785 pass, 5 fail)
+        #:tests? #f
+        ;#:phases
+        #;(modify-phases %standard-phases
+          (replace 'check
+                   (lambda _
+                     (invoke "stestr" "run")
+                     #t)))))
+    (native-inputs
+      (list python-hacking
+            python-coverage
+            python-ddt
+            python-fixtures
+            python-jsonschema
+            python-prometheus-client
+            python-oslo.config
+            python-oslotest
+            python-requests-mock
+            python-statsd
+            python-stestr
+            python-testscenarios
+            python-testtools
+            which))
+    (propagated-inputs
+      (list python-appdirs
+            python-cryptography
+            python-decorator
+            python-dogpile.cache
+            python-importlib-metadata
+            python-iso8601
+            python-jmespath
+            python-jsonpatch
+            python-keystoneauth1
+            python-munch
+            python-netifaces
+            python-os-service-types
+            python-pbr
+            python-pyyaml
+            python-requestsexceptions))
+    (home-page
+      "https://docs.openstack.org/openstacksdk/")
+    (synopsis
+      "An SDK for building applications to work with OpenStack")
+    (description
+      "An SDK for building applications to work with OpenStack")
+    (license asl2.0)))
+
 (define-public python-swiftclient
   (package
     (name "python-swiftclient")

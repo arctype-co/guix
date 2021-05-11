@@ -2047,6 +2047,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/python-libxml2-utf8.patch		\
   %D%/packages/patches/python-memcached-syntax-warnings.patch	\
   %D%/packages/patches/python-mox3-python3.6-compat.patch	\
+  %D%/packages/patches/python-openstacksdk-requirements.patch	\
   %D%/packages/patches/python-parso-unit-tests-in-3.10.patch    \
   %D%/packages/patches/python-packaging-test-arch.patch		\
   %D%/packages/patches/python-paste-remove-timing-test.patch	\
