@@ -7176,14 +7176,14 @@ format.")
 (define-public python-doc8
   (package
     (name "python-doc8")
-    (version "0.8.0")
+    (version "0.8.1")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "doc8" version))
        (sha256
         (base32
-         "0hw5w8mpgsp51qg8nnq28p7y1jiksvz7a0axnn5bkgss3af9zy1d"))))
+         "04ic108p5wlgfqds17ai8bgf17i25ps5w7csza7z0z40k0jz27ad"))))
     (build-system python-build-system)
     (arguments
      `(#:phases
