@@ -5184,14 +5184,14 @@ users' sessions over extended periods of time.")
 (define-public python-oauth2client
   (package
     (name "python-oauth2client")
-    (version "4.0.0")
+    (version "4.1.3")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "oauth2client" version))
        (sha256
         (base32
-         "1irqqap2zibysf8dba8sklfqikia579srd0phm5n754ni0h59gl0"))))
+         "1inc3j4hjhjvadn78xd2pwmkmmxcv5q6vlm4d2azd1qj8lg791nl"))))
     (build-system python-build-system)
     (arguments
      `(#:tests? #f))
