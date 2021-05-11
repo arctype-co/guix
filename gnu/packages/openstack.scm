@@ -993,6 +993,29 @@ SQLite for its identity store database, with the option to connect to external
 LDAP.")
     (license asl2.0)))
 
+(define-public python-requestsexceptions
+  (package
+    (name "python-requestsexceptions")
+    (version "1.4.0")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "requestsexceptions" version))
+        (sha256
+          (base32
+            "0r9hp9yzgj8r81q5gc6r8sgxldqc09xi6ax0b7a6dw0qfv3wp5dh"))
+        (patches (search-patches "python-requestsexceptions-requirements.patch"))))
+    (build-system python-build-system)
+    (native-inputs
+      `(("python-hacking" ,python-hacking)
+        ("python-pbr" ,python-pbr)))
+    (home-page "http://www.openstack.org/")
+    (synopsis
+      "Import exceptions from potentially bundled packages in requests.")
+    (description
+      "Import exceptions from potentially bundled packages in requests.")
+    (license asl2.0)))
+
 (define-public python-swiftclient
   (package
     (name "python-swiftclient")
