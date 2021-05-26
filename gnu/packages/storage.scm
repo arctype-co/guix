@@ -30,6 +30,7 @@
   #:use-module (gnu packages admin)
   #:use-module (gnu packages assembly)
   #:use-module (gnu packages authentication)
+  #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages bdw-gc)
   #:use-module (gnu packages boost)
@@ -208,7 +209,49 @@
                 (for-each (lambda (executable)
                             (wrap-program (string-append out "/" executable)
                               `("GUIX_PYTHONPATH" ":" prefix (,PYTHONPATH))))
-                          scripts)))))))
+                          scripts))
+               (substitute* "udev/50-rbd.rules"
+                 (("/usr/bin/ceph-rbdnamer")
+                  (string-append out "/bin/ceph-rbdnamer")))
+
+               ;; Patch absolute paths to utilities.
+               ;; Discussion at <https://github.com/ceph/ceph/pull/20938>
+               (substitute* "src/common/module.c"
+                 (("/sbin/modinfo") (string-append (assoc-ref inputs "kmod") "/bin/modinfo")))
+               (substitute* "src/common/module.c"
+                 (("/sbin/modprobe") (string-append (assoc-ref inputs "kmod") "/bin/modinfo")))
+               (substitute* "src/common/module.c"
+                 (("/bin/grep") (string-append (assoc-ref inputs "grep") "/bin/modinfo")))))
+         (add-before 'install 'set-install-environment
+           (lambda* (#:key outputs #:allow-other-keys)
+             (let* ((out (assoc-ref outputs "out"))
+                    (py3sitedir
+                     (string-append out "/lib/python"
+                                    ,(version-major+minor
+                                      (package-version python))
+                                    "/site-packages")))
+               ;; The Python install scripts refuses to function if
+               ;; the install directory is not on PYTHONPATH.
+               (setenv "PYTHONPATH" py3sitedir))))
+         (add-after 'install 'wrap-python-scripts
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (let* ((out (assoc-ref outputs "out"))
+                    (scripts '("bin/ceph" "bin/cephfs-top" "sbin/ceph-volume"))
+                    (dependencies (map (lambda (input)
+                                         (assoc-ref inputs input))
+                                       '("python-prettytable" "python-pyyaml")))
+                    (sitedir (lambda (package)
+                               (string-append package
+                                              "/lib/python"
+                                              ,(version-major+minor
+                                                (package-version python))
+                                              "/site-packages")))
+                    (PYTHONPATH (string-join (map sitedir (cons out dependencies))
+                                             ":")))
+               (for-each (lambda (executable)
+                           (wrap-program (string-append out "/" executable)
+                             `("GUIX_PYTHONPATH" ":" prefix (,PYTHONPATH))))
+                         scripts)))))))
     (outputs
      '("out" "lib"))
     (native-inputs
@@ -226,9 +269,11 @@
            fcgi
            fmt-8
            fuse-2
+           grep
            icu4c
            jemalloc
            keyutils
+           kmod
            leveldb
            libaio
            libatomic-ops
