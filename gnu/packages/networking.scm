@@ -48,6 +48,7 @@
 ;;; Copyright © 2021 Milkey Mouse <milkeymouse@meme.institute>
 ;;; Copyright © 2021 Guillaume Le Vaillant <glv@posteo.net>
 ;;; Copyright © 2021 Maxime Devos <maximedevos@telenet.be>
+;;; Copyright © 2021 Ryan Sundberg <ryan@arctype.co>
 ;;; Copyright © 2022 Simon South <simon@simonsouth.net>
 ;;; Copyright © 2022 Pavel Shlyak <p.shlyak@pantherx.org>
 ;;; Copyright © 2022 Pierre Langlois <pierre.langlois@gmx.com>
@@ -5048,3 +5049,65 @@ back to the servers which know the data.")
 recording packets that are dropped by the kernel.  It provides the commands
 @command{dropwatch} and @command{dwdump}.")
     (license license:gpl2+)))
+
+(define configure-bird6
+  `(lambda* (#:key #:allow-other-keys #:rest args)
+     (let ((configure-phase (assoc-ref %standard-phases 'configure)))
+       (apply
+         configure-phase
+         (append args '(#:configure-flags ("--enable-ipv6")))))))
+
+(define-public bird-1
+  (package
+    (name "bird")
+    (version "1.6.7")
+    (source
+      (origin
+        (method git-fetch)
+        (uri (git-reference
+               (url "https://gitlab.nic.cz/labs/bird.git")
+               (commit (string-append "v" version))))
+        (sha256 (base32 "0vbjp42c2zqmcrqcwm4g4fq1v93l6rlk0c27i0k08f3v07w75cih"))))
+    (build-system gnu-build-system)
+    (arguments
+      `(#:tests? #f ;; No tests defined for bird 1
+        #:phases
+        (modify-phases
+          %standard-phases
+          ;; Fix "cc not found" in tools/mergedirs
+          (add-after 'bootstrap 'set-cc
+            (lambda _
+              (setenv "CPP" ,(string-append (cc-for-target) " -E"))))
+          ;; Build bird6 after building bird.
+          ;; bird6 and bird are configured independently.
+          (add-after 'install 'configure-bird6 ,configure-bird6)
+          (add-after 'configure-bird6 'build-bird6
+                     (assoc-ref %standard-phases 'build))
+          (add-after 'build-bird6 'install-bird6
+                     (assoc-ref %standard-phases 'install)))))
+    (inputs
+      `(("ncurses" ,ncurses)
+        ("readline" ,readline)))
+    (native-inputs
+      `(("autoconf" ,autoconf)
+        ("bison" ,bison)
+        ("flex" ,flex)))
+    (home-page "http://bird.network.cz/")
+    (synopsis "BIRD Internet Routing Daemon")
+    (description "The BIRD project aims to develop a dynamic IP routing daemon
+with full support of all modern routing protocols, easy to use configuration
+interface and powerful route filtering language.")
+    (license license:gpl2+)))
+
+(define-public bird
+  (package
+    (inherit bird-1)
+    (version "2.0.8")
+    (source
+      (origin
+        (method git-fetch)
+        (uri (git-reference
+               (url "https://gitlab.nic.cz/labs/bird.git")
+               (commit (string-append "v" version))))
+        (sha256 (base32 "07mh41hsmkcpf6f6lnygzp6g59jma542pcqdkl54ysiqnjmi5zz1"))))
+    (arguments `())))
