@@ -1364,7 +1364,8 @@ well as bzip2.")
         (base32 "03zz56h79z0sgvi5sangjqn9dahhzvf645v26n1y0gwmfbmsax95"))
        (patches
         (search-patches "snappy-add-O2-flag-in-CmakeLists.txt.patch"
-                        "snappy-add-inline-for-GCC.patch"))))
+                        "snappy-add-inline-for-GCC.patch"
+                        "snappy-enable-rtti.patch"))))
     (build-system cmake-build-system)
     (arguments
      `(#:configure-flags
