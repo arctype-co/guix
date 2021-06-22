@@ -64,6 +64,7 @@
 # Copyright © 2023, 2024 gemmaro <gemmaro.dev@gmail.com>
 # Copyright © 2023 Herman Rimm <herman@rimm.ee>
 # Copyright © 2023 Troy Figiel <troy@troyfigiel.com>
+# Copyright © 2023 Ryan Sundberg <ryan@arctype.co>
 # Copyright © 2024 David Elsing <david.elsing@posteo.net>
 # Copyright © 2024 Ashish SHUKLA <ashish.is@lostca.se>
 # Copyright © 2024 Fabio Natali <me@fabionatali.com>
@@ -385,6 +386,7 @@ GNU_SYSTEM_MODULES =				\
   %D%/packages/java.scm				\
   %D%/packages/java-bootstrap.scm		\
   %D%/packages/java-compression.scm		\
+  %D%/packages/java-databases.scm		\
   %D%/packages/java-graphics.scm		\
   %D%/packages/java-maths.scm			\
   %D%/packages/java-rdf.scm			\
@@ -2117,6 +2119,8 @@ dist_patch_DATA =						\
   %D%/packages/patches/retroarch-improved-search-paths.patch	\
   %D%/packages/patches/rng-tools-revert-build-randstat.patch	\
   %D%/packages/patches/rocclr-5.6.0-enable-gfx800.patch		\
+  %D%/packages/patches/rocksdb-disable-unstable-tests.patch \
+  %D%/packages/patches/rocksdb-segfault-issue-2472.patch \
   %D%/packages/patches/rocm-bandwidth-test-5.5.0-fix-includes.patch	\
   %D%/packages/patches/rocm-comgr-3.1.0-dependencies.patch 	\
   %D%/packages/patches/rocm-opencl-runtime-4.3-noclinfo.patch 	\
