@@ -1,0 +1,33 @@
+From 6ac12592bee07dbdb3d5612c8eaa50f9e26b58ae Mon Sep 17 00:00:00 2001
+From: Ryan Sundberg <ryan@arctype.co>
+Date: Mon, 20 Jun 2021 22:28:25 -0700
+Subject: [PATCH] Enable RTTI for compatibility
+
+Remove -fno-rtti from the CXX flags. This flag added in snappy-1.1.9
+broke dynamic loading compatibility from other programs.
+
+See https://github.com/Homebrew/homebrew-core/pull/76686 and
+https://github.com/facebook/proxygen/issues/361 for discussion
+around this issue and related bugs.
+---
+ CMakeLists.txt | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 672561e..2f97b73 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -76,10 +76,6 @@ else(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+   # Disable C++ exceptions.
+   string(REGEX REPLACE "-fexceptions" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions")
+-
+-  # Disable RTTI.
+-  string(REGEX REPLACE "-frtti" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+ endif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+ 
+ # BUILD_SHARED_LIBS is a standard CMake variable, but we declare it here to make
+-- 
+2.31.1
+
