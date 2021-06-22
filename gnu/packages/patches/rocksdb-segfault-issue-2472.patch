@@ -1,0 +1,30 @@
+From 16fc5c70a34efacea4c3b6712ab8e3e961dd5027 Mon Sep 17 00:00:00 2001
+From: Ryan Sundberg <ryan@arctype.co>
+Date: Mon, 21 Jun 2021 22:19:40 -0700
+Subject: [PATCH] Enable assertions when DEBUG_LEVEL = 0
+
+This is a workaround for a segmentation fault in the Rockdb Java test suite
+when DEBUG_LEVEL = 0. See https://github.com/facebook/rocksdb/issues/2472 for
+background information.
+---
+ java/Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/java/Makefile b/java/Makefile
+index 12eb95f03..aae624be9 100644
+--- a/java/Makefile
++++ b/java/Makefile
+@@ -213,7 +213,9 @@ JAVA_ARGS ?=
+ JAVAC_ARGS ?=
+ 
+ # When debugging add -Xcheck:jni to the java args
+-ifneq ($(DEBUG_LEVEL),0)
++ifeq ($(DEBUG_LEVEL),0)
++	JAVA_ARGS += -ea
++else
+ 	JAVA_ARGS += -ea -Xcheck:jni
+ 	JAVAC_ARGS += -Xlint:deprecation -Xlint:unchecked
+ endif
+-- 
+2.31.1
+

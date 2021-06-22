@@ -63,6 +63,7 @@
 # Copyright © 2023 gemmaro <gemmaro.dev@gmail.com>
 # Copyright © 2023 Herman Rimm <herman@rimm.ee>
 # Copyright © 2023 Troy Figiel <troy@troyfigiel.com>
+# Copyright © 2023 Ryan Sundberg <ryan@arctype.co>
 #
 # This file is part of GNU Guix.
 #
@@ -360,6 +361,7 @@ GNU_SYSTEM_MODULES =				\
   %D%/packages/java.scm				\
   %D%/packages/java-bootstrap.scm		\
   %D%/packages/java-compression.scm		\
+  %D%/packages/java-databases.scm		\
   %D%/packages/java-graphics.scm		\
   %D%/packages/java-maths.scm			\
   %D%/packages/java-rdf.scm			\
@@ -1980,6 +1982,8 @@ dist_patch_DATA =						\
   %D%/packages/patches/restic-0.9.6-fix-tests-for-go1.15.patch	\
   %D%/packages/patches/rng-tools-revert-build-randstat.patch	\
   %D%/packages/patches/rocclr-5.6.0-enable-gfx800.patch		\
+  %D%/packages/patches/rocksdb-disable-unstable-tests.patch \
+  %D%/packages/patches/rocksdb-segfault-issue-2472.patch \
   %D%/packages/patches/rocm-bandwidth-test-5.5.0-fix-includes.patch	\
   %D%/packages/patches/rocm-comgr-3.1.0-dependencies.patch 	\
   %D%/packages/patches/rocm-opencl-runtime-4.3-noclinfo.patch 	\
