@@ -188,6 +188,7 @@
   #:use-module (guix build-system qt)
   #:use-module (guix build-system ruby)
   #:use-module (guix build-system cmake)
+  #:use-module (guix gexp)
   #:use-module (guix utils)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
@@ -1831,6 +1832,8 @@ including field and record folding.")
                (base32
                 "0mylma106w93kxhj89g9y1ccdq7m9m94wrmv5nyr17yc1zsk87sg"))
               (modules '((guix build utils)))
+              (patches (search-patches "rocksdb-disable-unstable-tests.patch"
+                                       "rocksdb-segfault-issue-2472.patch"))
               (snippet
                '(begin
                   ;; TODO: unbundle gtest.
@@ -1863,7 +1866,11 @@ including field and record folding.")
          (add-after 'unpack 'build-generically
            (lambda _
              (substitute* "CMakeLists.txt"
-               (("if\\(HAVE_SSE42\\)") "if(FALSE)")))))))
+               (("if\\(HAVE_SSE42\\)") "if(FALSE)"))
+             ;; Minimum rate assertions are unstable on slower machines; disable them.
+             (substitute* "util/rate_limiter_test.cc"
+                          (("ASSERT_GE\\(rate") "// ASSERT_GE(rate"))
+             #t)))))
     (native-inputs
      (list parallel perl procps python which))
     (inputs

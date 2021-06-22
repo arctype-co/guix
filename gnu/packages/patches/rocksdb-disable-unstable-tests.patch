@@ -1,0 +1,27 @@
+From c7d21ec170805b15293300493713c72185fc0683 Mon Sep 17 00:00:00 2001
+From: Ryan Sundberg <ryan@arctype.co>
+Date: Mon, 21 Jun 2021 22:01:46 -0700
+Subject: [PATCH] Disable test
+ DBWALTestWithParam/DBWALTestWithParam.WALTrashCleanupOnOpen/0
+
+This test is unstable. See https://github.com/facebook/rocksdb/issues/7546 for more info.
+---
+ db/db_sst_test.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/db/db_sst_test.cc b/db/db_sst_test.cc
+index 687d3b852..8b6c4cff2 100644
+--- a/db/db_sst_test.cc
++++ b/db/db_sst_test.cc
+@@ -498,7 +498,7 @@ class DBWALTestWithParam
+   bool wal_dir_same_as_dbname_;
+ };
+ 
+-TEST_P(DBWALTestWithParam, WALTrashCleanupOnOpen) {
++TEST_P(DBWALTestWithParam, DISABLED_WALTrashCleanupOnOpen) {
+   class MyEnv : public EnvWrapper {
+    public:
+     MyEnv(Env* t) : EnvWrapper(t), fake_log_delete(false) {}
+-- 
+2.31.1
+
