@@ -138,7 +138,9 @@
 
 (define* (virtualized-operating-system os
                                        #:optional (mappings '())
-                                       #:key (full-boot? #f) volatile?
+                                       #:key (full-boot? #f)
+                                       volatile?
+                                       (keep-file-systems? #f)
                                        (system (%current-system))
                                        (target (%current-target-system)))
   "Return an operating system based on OS suitable for use in a virtualized
@@ -247,6 +249,7 @@ with '-virtfs' options for the host file systems listed in SHARED-FS."
                                                 (memory-size 512)
                                                 (mappings '())
                                                 full-boot?
+                                                (keep-file-systems? #f)
                                                 (disk-image-size
                                                  (* (if full-boot? 500 70)
                                                     (expt 2 20)))
@@ -259,8 +262,8 @@ MAPPINGS is a list of <file-system-mapping> specifying mapping of host file
 systems into the guest.
 
 When FULL-BOOT? is true, the returned script runs everything starting from the
-bootloader; otherwise it directly starts the operating system kernel.  When
-VOLATILE? is true, an overlay is created on top of a read-only
+bootloader; otherwise it directly starts the operating system kernel.
+When VOLATILE? is true, an overlay is created on top of a read-only
 storage. Otherwise the storage is made persistent.  The DISK-IMAGE-SIZE
 parameter specifies the size in bytes of the root disk image; it is mostly
 useful when FULL-BOOT?  is true."
@@ -269,7 +272,8 @@ useful when FULL-BOOT?  is true."
                                 #:full-boot? full-boot?
                                 #:volatile? volatile?
                                 #:system system
-                                #:target target))
+                                #:target target
+                                #:keep-file-systems? keep-file-systems?))
                        (base-image -> (system-image
                                        (image
                                         (inherit
