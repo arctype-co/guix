@@ -123,7 +123,10 @@
        (create-mount-point? #t)))))
 
 (define* (virtualized-operating-system os mappings
-                                       #:key (full-boot? #f) volatile?)
+                                       #:key
+                                       (full-boot? #f)
+                                       (keep-file-systems? #f)
+                                       volatile?)
   "Return an operating system based on OS suitable for use in a virtualized
 environment with the store shared with the host.  MAPPINGS is a list of
 <file-system-mapping> to realize in the virtualized OS."
@@ -225,6 +228,7 @@ with '-virtfs' options for the host file systems listed in SHARED-FS."
                                                 (memory-size 512)
                                                 (mappings '())
                                                 full-boot?
+                                                (keep-file-systems? #f)
                                                 (disk-image-size
                                                  (* (if full-boot? 500 70)
                                                     (expt 2 20)))
@@ -237,15 +241,16 @@ MAPPINGS is a list of <file-system-mapping> specifying mapping of host file
 systems into the guest.
 
 When FULL-BOOT? is true, the returned script runs everything starting from the
-bootloader; otherwise it directly starts the operating system kernel.  When
-VOLATILE? is true, an overlay is created on top of a read-only
+bootloader; otherwise it directly starts the operating system kernel.
+When VOLATILE? is true, an overlay is created on top of a read-only
 storage. Otherwise the storage is made persistent.  The DISK-IMAGE-SIZE
 parameter specifies the size in bytes of the root disk image; it is mostly
 useful when FULL-BOOT?  is true."
   (mlet* %store-monad ((os ->  (virtualized-operating-system
                                 os mappings
                                 #:full-boot? full-boot?
-                                #:volatile? volatile?))
+                                #:volatile? volatile?
+                                #:keep-file-systems? keep-file-systems?))
                        (base-image -> (system-image
                                        (image
                                         (inherit
