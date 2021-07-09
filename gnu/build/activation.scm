@@ -240,15 +240,15 @@ they already exist."
             (system?      (user-account-system? user)))
         ;; The home directories of system accounts are created during
         ;; activation, not here.
-        (unless (or (not home) (not create-home?) system?
-                    (directory-exists? home))
+        (unless (or (not home) (not create-home?) system?)
           (let* ((pw  (getpwnam name))
                  (uid (passwd:uid pw))
                  (gid (passwd:gid pw)))
             (mkdir-p home)
             (chmod home #o700)
-            (copy-account-skeletons home
-                                    #:uid uid #:gid gid)
+            (unless (directory-exists? home)
+              (copy-account-skeletons home
+                                      #:uid uid #:gid gid))
 
             ;; It is important 'chown' be called after
             ;; 'copy-account-skeletons'.  Otherwise, a malicious user with
