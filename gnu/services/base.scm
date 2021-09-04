@@ -108,6 +108,7 @@
   #:export (fstab-service-type
             root-file-system-service
             file-system-service-type
+            file-system-shepherd-service
             file-system-utilities
             swap-service
             host-name-service  ; deprecated
