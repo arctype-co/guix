@@ -385,6 +385,7 @@ when booting a root file system on a Btrfs subvolume."
           (device (menu-entry-device entry))
           (device-mount-point (menu-entry-device-mount-point entry))
           (multiboot-kernel (menu-entry-multiboot-kernel entry))
+          (netbsd-kernel (menu-entry-netbsd-kernel entry))
           (chain-loader (menu-entry-chain-loader entry)))
       (cond
        (linux
@@ -433,15 +434,15 @@ menuentry ~s {
                     (string-join (list #$@arguments) " " 'prefix)
                     (string-join (map string-join '#$modules)
                                  "\n  module " 'prefix))))
-       (chain-loader
-        #~(format port "
-menuentry ~s {
-  ~a
-  chainloader ~a
-}~%"
-                  #$label
-                  #$(grub-root-search device chain-loader)
-                  #$chain-loader)))))
+       (netbsd-kernel
+         (let ((arguments (menu-entry-netbsd-arguments entry)))
+           #~(format port "
+                     menuentry ~s {
+                     knetbsd ~a~a
+                     }~%"
+                     #$label
+                     #$netbsd-kernel
+                     (string-join (list #$@arguments) " " 'prefix)))))))
 
   (define (crypto-devices)
     (define (crypto-device->cryptomount dev)
