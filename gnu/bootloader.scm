@@ -50,6 +50,8 @@
             menu-entry-multiboot-arguments
             menu-entry-multiboot-modules
             menu-entry-chain-loader
+            menu-entry-netbsd-kernel
+            menu-entry-netbsd-arguments
 
             menu-entry->sexp
             sexp->menu-entry
@@ -112,7 +114,11 @@
                      (default '()))        ; list of multiboot commands, where
                                            ; a command is a list of <string>
   (chain-loader     menu-entry-chain-loader
-                    (default #f)))         ; string, path of efi file
+                    (default #f))          ; string, path of efi file
+  (netbsd-kernel   menu-entry-netbsd-kernel
+                   (default #f))
+  (netbsd-arguments menu-entry-netbsd-arguments
+                   (default '())))         ; list of string-valued gexps
 
 (define (report-menu-entry-error menu-entry)
   (raise
@@ -143,7 +149,7 @@
   (match entry
     (($ <menu-entry> label device mount-point
                      (? identity linux) linux-arguments (? identity initrd)
-                     #f () () #f)
+                     #f () () #f #f ())
      `(menu-entry (version 0)
                   (label ,label)
                   (device ,(device->sexp device))
@@ -153,7 +159,7 @@
                   (initrd ,initrd)))
     (($ <menu-entry> label device mount-point #f () #f
                      (? identity multiboot-kernel) multiboot-arguments
-                     multiboot-modules #f)
+                     multiboot-modules #f #f ())
      `(menu-entry (version 0)
                   (label ,label)
                   (device ,(device->sexp device))
@@ -162,12 +168,20 @@
                   (multiboot-arguments ,multiboot-arguments)
                   (multiboot-modules ,multiboot-modules)))
     (($ <menu-entry> label device mount-point #f () #f #f () ()
-                     (? identity chain-loader))
+                     (? identity chain-loader) #f ())
      `(menu-entry (version 0)
                   (label ,label)
                   (device ,(device->sexp device))
                   (device-mount-point ,mount-point)
                   (chain-loader ,chain-loader)))
+    (($ <menu-entry> label device mount-point #f () #f #f () ()
+                     #f (? identity netbsd-kernel) netbsd-arguments)
+     `(menu-entry (version 0)
+                  (label ,label)
+                  (device ,(device->sexp device))
+                  (device-mount-point ,mount-point)
+                  (netbsd-kernel ,netbsd-kernel)
+                  (netbsd-arguments ,netbsd-arguments)))
     (_ (report-menu-entry-error entry))))
 
 (define (sexp->menu-entry sexp)
@@ -214,7 +228,18 @@ record."
       (label label)
       (device (sexp->device device))
       (device-mount-point mount-point)
-      (chain-loader chain-loader)))))
+      (chain-loader chain-loader)))
+    (('menu-entry ('version 0)
+                  ('label label) ('device device)
+                  ('device-mount-point mount-point)
+                  ('netbsd-kernel netbsd-kernel)
+                  ('netbsd-arguments netbsd-arguments) _ ...)
+     (menu-entry
+      (label label)
+      (device (sexp->device device))
+      (device-mount-point mount-point)
+      (netbsd-kernel netbsd-kernel)
+      (netbsd-arguments netbsd-arguments)))))
 
 
 ;;;
