@@ -315,15 +315,15 @@ and provides a \"top-like\" mode (monitoring).")
 (define-public shepherd-0.8
   (package
     (name "shepherd")
-    (version "master-20210501")
+    (version "arctype")
     (source (origin
               (method git-fetch)
               (uri (git-reference
-                     (url "git://git.savannah.gnu.org/shepherd.git")
-                     (commit "4c5176f5a7a5a1e7d7f258f585e8ed127a21b99a")))
+                     (url "https://github.com/arctype-co/shepherd.git")
+                     (commit "94ad8057c6f9a020f12efd78d482b0cf4fe160ec")))
               (sha256
                (base32
-                "0x7njnvhxmay4xz4pyh9b982bhxys089nysz95paz3vhf1253fr6"))
+                "1br1jx99v0k8350kywgv70996dfgb6bhyzhs27865h4if2grqgff"))
               (modules '((guix build utils)))
               (snippet
                '(begin
@@ -352,7 +352,8 @@ and provides a \"top-like\" mode (monitoring).")
            gnu-gettext
            help2man
            info-reader
-           texi2html))
+           texi2html
+           texinfo))
     (inputs
      ;; ... and this is the one that appears in shebangs when cross-compiling.
      (list guile-3.0
