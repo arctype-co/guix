@@ -581,11 +581,12 @@ SCM_TESTS =					\
   tests/store-deduplication.scm		\
   tests/store-roots.scm			\
   tests/store.scm				\
+  tests/style.scm				\
   tests/substitute.scm				\
   tests/swh.scm				\
   tests/syscalls.scm				\
   tests/system.scm				\
-  tests/style.scm				\
+  tests/system/vm.scm				\
   tests/texlive.scm				\
   tests/transformations.scm			\
   tests/ui.scm					\
