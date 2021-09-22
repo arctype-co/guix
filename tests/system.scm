@@ -25,27 +25,10 @@
   #:use-module ((guix gexp) #:select (lower-object))
   #:use-module ((guix utils) #:select (%current-system))
   #:use-module (srfi srfi-1)
-  #:use-module (srfi srfi-64))
+  #:use-module (srfi srfi-64)
+  #:use-module (tests system fixture))
 
 ;; Test the (gnu system) module.
-
-(define %root-fs
-  (file-system
-    (device (file-system-label "my-root"))
-    (mount-point "/")
-    (type "ext4")))
-
-(define %os
-  (operating-system
-    (host-name "komputilo")
-    (timezone "Europe/Berlin")
-    (locale "en_US.utf8")
-    (bootloader (bootloader-configuration
-                 (bootloader grub-bootloader)
-                 (targets '("/dev/sdX"))))
-    (file-systems (cons %root-fs %base-file-systems))
-
-    (users %base-user-accounts)))
 
 (define %luks-device
   (mapped-device
