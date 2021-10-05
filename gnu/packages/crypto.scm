@@ -48,6 +48,7 @@
   #:use-module (gnu packages admin)
   #:use-module (gnu packages aidc)
   #:use-module (gnu packages attr)
+  #:use-module (gnu packages assembly)
   #:use-module (gnu packages autotools)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages boost)
@@ -90,6 +91,7 @@
   #:use-module (gnu packages tcl)
   #:use-module (gnu packages tls)
   #:use-module (gnu packages version-control)
+  #:use-module (gnu packages wxwidgets)
   #:use-module (gnu packages xml)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
@@ -1737,3 +1739,50 @@ default Keychain will only start ssh-agent, but it can also be
 configured to start gpg-agent.")
     (home-page "https://www.funtoo.org/Keychain")
     (license license:gpl2)))
+
+(define-public veracrypt
+  (package
+    (name "veracrypt")
+    (version "1.24")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append
+             "https://www.veracrypt.fr/code/VeraCrypt/snapshot/VeraCrypt_"
+             version ".tar.gz"))
+       (sha256
+        (base32 "0nn44x7ldkblgkndrd726nkil5bsdaki7j11xi21pr1gjrp7kq2g"))))
+    (build-system gnu-build-system)
+    (arguments
+      '(#:phases
+        (modify-phases %standard-phases
+          (delete 'configure)
+          (add-before 'build 'build-env
+            (lambda* (#:key outputs #:allow-other-keys)
+              (chdir "src")
+              (setenv "CC" "gcc")
+              (setenv "DESTDIR" (assoc-ref outputs "out"))
+              #t))
+          (add-after 'install 'fix-install
+            (lambda* (#:key outputs version #:allow-other-keys)
+              (let ((out (assoc-ref outputs "out")))
+                (install-file (string-append out "/usr/bin/veracrypt") (string-append out "/bin"))
+                (copy-recursively (string-append out "/usr/share/applications") (string-append out "/share/applications"))
+                (copy-recursively (string-append out "/usr/share/pixmaps") (string-append out "/share/pixmaps"))
+                (copy-recursively (string-append out "/usr/share/doc/veracrypt/HTML") (string-append out "/share/doc/veracrypt-1.24/HTML"))
+                (delete-file-recursively (string-append out "/usr"))))))
+        ; Veracrypt only has a test suite for Windows.
+        #:tests? #f))
+    (native-inputs
+     `(("pkg-config" ,pkg-config)
+       ("yasm" ,yasm)))
+    (inputs
+      `(("fuse" ,fuse)
+        ("wxwidgets" ,wxwidgets)))
+    (propagated-inputs
+      `(("lvm2" ,lvm2)))
+    (home-page "https://www.veracrypt.fr/")
+    (synopsis "Disk encryption software")
+    (description "VeraCrypt is a free open source disk encryption software
+based on TrueCrypt 7.1a.")
+    (license license:asl2.0)))
