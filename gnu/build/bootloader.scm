@@ -105,6 +105,7 @@ the output filename.  Otherwise, use defaults for the host platform."
         (format port
                 "insmod part_msdos~@
                insmod part_gpt~@
+               insmod all_video~@
                search --set=root --label Guix_image~@
                configfile /boot/grub/grub.cfg~%")))
     (install-efi grub-efi grub-config esp #:targets targets)
