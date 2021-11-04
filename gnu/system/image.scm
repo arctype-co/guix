@@ -918,6 +918,7 @@ to OS.  Also set the UUID and the size of the root partition."
            (if (root-partition? p)
                (partition
                 (inherit p)
+                (file-system (file-system-type root-file-system))
                 (uuid (file-system-device root-file-system))
                 (size (root-size base-image)))
                p))
