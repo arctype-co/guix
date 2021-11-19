@@ -1327,10 +1327,22 @@ we're running in the final root."
                                #:target-type
                                shepherd-root-service-type)))))
 
+(define (operating-system-system-service-type os)
+  "Returns the system-service-type for os. The system-service-type is
+   the first in the list of essential-services named 'system."
+  (car
+    (filter
+      (lambda (svc-type)
+        (eq? 'system (service-type-name svc-type)))
+      (map service-kind 
+           (operating-system-essential-services os)))))
+
 (define* (operating-system-derivation os)
   "Return a derivation that builds OS."
   (let* ((services (operating-system-services os))
-         (system   (fold-services services)))
+         (system-service-type-for-os (operating-system-system-service-type os))
+         (system (fold-services services 
+                                #:target-type system-service-type-for-os)))
     ;; SYSTEM contains the derivation as a monadic value.
     (service-value system)))
 
