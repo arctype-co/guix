@@ -1210,8 +1210,7 @@ instantiated; other missing services lead to a
         adjusted
         (loop adjusted))))
 
-(define* (fold-services services
-                        #:key (target-type system-service-type))
+(define* (fold-services services #:key target-type)
   "Fold SERVICES by propagating their extensions down to the root of type
 TARGET-TYPE; return the root service adjusted accordingly."
   (define dependents
