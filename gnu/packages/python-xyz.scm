@@ -300,6 +300,7 @@
   #:use-module (guix build-system meson)
   #:use-module (guix build-system pyproject)
   #:use-module (guix build-system python)
+  #:use-module (guix build-system trivial)
   #:use-module (guix download)
   #:use-module (guix hg-download)
   #:use-module (guix git-download)
@@ -38030,6 +38031,31 @@ functions
     (description "This package allows the programmatic creation of
 markdown-compliant strings.")
     (license license:expat)))
+
+(define-public python-pywin32-stub
+  (package
+    (name "python-pywin32")
+    (version "b300")
+    (source
+      (origin
+        (method git-fetch)
+        (uri
+          (git-reference
+            (url "https://github.com/mhammond/pywin32.git")
+            (commit version)))
+        (sha256
+          (base32
+            "1pyjg3q1117arzz6ncq34r39c694v2wcnmbqw68wczxlfp431d46"))))
+    (build-system trivial-build-system)
+    (arguments
+      `(#:builder (begin (mkdir %output) #t)))
+    (home-page
+      "https://github.com/mhammond/pywin32")
+    (synopsis
+      "Python for Win32 (pywin32) extensions, which provides access to many of the Windows APIs from Python.")
+    (description
+      "Python for Win32 (pywin32) extensions, which provides access to many of the Windows APIs from Python. This is a stub to fix guix import pypy for this package.")
+    (license #f)))
 
 (define-public python-yattag
   (package
