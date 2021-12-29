@@ -327,10 +327,10 @@ and provides a \"top-like\" mode (monitoring).")
               (modules '((guix build utils)))
               (snippet
                '(begin
-                  ;; Build with -O1 to work around <https://bugs.gnu.org/48368>.
-                  (substitute* "Makefile.in"
+                  ;; Build with -Ono-resolve-primitives to work around <https://bugs.gnu.org/48368>.
+                  (substitute* "Makefile.am"
                     (("compile --target")
-                     "compile -O1 --target"))))))
+                     "compile -O2 -Ono-resolve-primitives --target"))))))
     (build-system gnu-build-system)
     (arguments
      '(#:configure-flags '("--localstatedir=/var")
