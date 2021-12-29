@@ -30154,6 +30154,25 @@ converters and more, those based on the library itself.")
 structure.")
     (license license:expat)))
 
+(define-public python-pykerberos
+  (package
+    (name "python-pykerberos")
+    (version "1.2.1")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "pykerberos" version))
+        (sha256
+          (base32
+            "0v47p840myqgc7hr4lir72xshcfpa0w8j9n077h3njpqyn6wlbag"))))
+    (build-system python-build-system)
+    (inputs
+     `(("mit-krb5" ,mit-krb5)))
+    (home-page "")
+    (synopsis "High-level interface to Kerberos")
+    (description "High-level interface to Kerberos")
+    (license license:asl2.0)))
+
 (define-public python-pykwalify
   (package
     (name "python-pykwalify")
