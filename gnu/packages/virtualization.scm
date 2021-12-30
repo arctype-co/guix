@@ -228,7 +228,7 @@
      (list
       ;; FIXME: Disable tests on i686 to work around
       ;; <https://bugs.gnu.org/40527>.
-      #:tests? (or (%current-target-system)
+      #:tests? #f #;(or (%current-target-system)
                    (not (string=? "i686-linux" (%current-system))))
       #:configure-flags
       #~(let ((gcc (search-input-file %build-inputs "/bin/gcc"))
