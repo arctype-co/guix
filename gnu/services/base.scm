@@ -119,6 +119,9 @@
             host-aliases
             hosts-service-type
 
+            cidr->ip
+            cidr->netmask
+            <static-networking>
             static-networking
             static-networking?
             static-networking-addresses
@@ -126,6 +129,7 @@
             static-networking-routes
             static-networking-requirement
 
+            <network-address>
             network-address
             network-address?
             network-address-device
