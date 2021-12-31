@@ -37,7 +37,7 @@
   #:use-module (srfi srfi-35)
   #:use-module (srfi srfi-37)
   #:use-module (srfi srfi-71)
-  #:export (guix-deploy))
+  #:export (deploy-machine* guix-deploy))
 
 ;;; Commentary:
 ;;;
