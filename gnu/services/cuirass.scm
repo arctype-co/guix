@@ -45,6 +45,7 @@
             cuirass-configuration
             cuirass-configuration?
             cuirass-service-type
+            cuirass-shepherd-service
 
             cuirass-remote-worker-configuration
             cuirass-remote-worker-configuration?
