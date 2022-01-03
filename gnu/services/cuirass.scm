@@ -96,6 +96,8 @@
                     (default "/var/log/cuirass-web.log"))
   (cache-directory  cuirass-configuration-cache-directory ;string (dir-name)
                     (default "/var/cache/cuirass"))
+  (state-directory  cuirass-configuration-state-directory ;string (dir-name)
+                    (default "/var"))
   (user             cuirass-configuration-user ;string
                     (default "cuirass"))
   (group            cuirass-configuration-group ;string
@@ -131,6 +133,7 @@
   "Return a <shepherd-service> for the Cuirass service with CONFIG."
   (let ((cuirass          (cuirass-configuration-cuirass config))
         (cache-directory  (cuirass-configuration-cache-directory config))
+        (state-directory  (cuirass-configuration-state-directory config))
         (web-log-file     (cuirass-configuration-web-log-file config))
         (main-log-file    (cuirass-configuration-log-file config))
         (user             (cuirass-configuration-user config))
@@ -187,7 +190,8 @@
                   #:environment-variables
                   (list "GIT_SSL_CAINFO=/etc/ssl/certs/ca-certificates.crt"
                         (string-append "GIT_EXEC_PATH=" #$git
-                                       "/libexec/git-core"))
+                                       "/libexec/git-core")
+                        (string-append "CUIRASS_STATE_DIRECTORY=" #$state-directory))
 
                   #:user #$user
                   #:group #$group
