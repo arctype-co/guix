@@ -70,6 +70,7 @@
             wireguard-peer-preshared-key
             wireguard-peer-keep-alive
 
+            <wireguard-configuration>
             wireguard-configuration
             wireguard-configuration?
             wireguard-configuration-wireguard
