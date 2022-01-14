@@ -22,6 +22,15 @@
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (gnu packages clojure)
+  #:use-module ((guix build utils) #:select (alist-replace))
+  #:use-module (guix build-system ant)
+  #:use-module (guix build-system copy)
+  #:use-module (guix build-system clojure)
+  #:use-module (guix download)
+  #:use-module (guix git-download)
+  #:use-module ((guix licenses) #:prefix license:)
+  #:use-module (guix packages)
+  #:use-module (guix utils)
   #:use-module (gnu packages)
   #:use-module (gnu packages java)
   #:use-module (gnu packages maven)
@@ -30,18 +39,23 @@
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix git-download)
-  #:use-module (guix build-system ant)
-  #:use-module (guix build-system copy)
-  #:use-module (guix build-system clojure)
-  #:use-module (ice-9 match))
+  #:use-module (ice-9 match)
+  #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-13))
 
-(define-public clojure
-  (let* ((lib (lambda (prefix version hash)
-                (origin (method url-fetch)
-                        (uri (string-append "https://github.com/clojure/"
-                                            prefix version ".tar.gz"))
-                        (sha256 (base32 hash)))))
-         ;; The libraries below are needed to run the tests.
+(define (lib prefix version hash)
+  (origin (method url-fetch)
+    (uri (string-append "https://github.com/clojure/"
+                        prefix version ".tar.gz"))
+    (sha256 (base32 hash))))
+
+(define (jar uri hash)
+  (origin (method url-fetch)
+    (uri uri)
+    (sha256 (base32 hash))))
+
+(define-public clojure-1.10.0
+  (let* (;; The libraries below are needed to run the tests.
          (libraries
           `(("core-specs-alpha-src"
              ,(lib "core.specs.alpha/archive/v"
@@ -78,7 +92,6 @@
          (library-names (match libraries
                           (((library-name _) ...)
                            library-name))))
-
     (package
       (name "clojure")
       (version "1.11.1")
@@ -257,6 +270,96 @@ designs.")
     (description "The Clojure command line tools can be used to start a
 Clojure repl, use Clojure and Java libraries, and start Clojure programs.")
     (license license:epl1.0)))
+
+(define-public clojure-1.10.3
+  (let* ((libraries
+          `(("core-specs-alpha-src"
+             ,(lib "core.specs.alpha/archive/core.specs.alpha-"
+                   "0.2.56"
+                   "056lngi5g3mi17nm4y41py8rnyriwm1lryg9hy8rbxm4jv5w8lhc"))
+            ("data-generators-src"
+             ,(lib "data.generators/archive/data.generators-"
+                   "0.1.2"
+                   "0kki093jp4ckwxzfnw8ylflrfqs8b1i1wi9iapmwcsy328dmgzp1"))
+            ; TODO compile spec.alpha jar from source using clojure-1.10.0 to "bootstrap".
+            ;
+            ; In Clojure 1.10.1 the class loader requires spec.alpha to be AOT-compiled
+            ; in order to build the test suite. Download the spec.alpha jar directly from
+            ; Maven Central and insert it into the classpath instead of loading just the sources.
+            ;
+            ; Ideally we should compile spec.alpha here as part of a bootstrapping process 
+            ; rather than download the jar with precompiled classes.
+            ("spec-alpha"
+             ,(jar "https://repo1.maven.org/maven2/org/clojure/spec.alpha/0.2.194/spec.alpha-0.2.194.jar"
+                   "171471yh4mg432pbksphmn6yx382v5m98ad17sqn9319hpwrjs6g"))
+            ("test-check-src"
+             ,(lib "test.check/archive/test.check-"
+                   "0.9.0"
+                   "0p0mnyhr442bzkz0s4k5ra3i6l5lc7kp6ajaqkkyh4c2k5yck1md"))
+            ("test-generative-src"
+             ,(lib "test.generative/archive/test.generative-"
+                   "0.5.2"
+                   "1pjafy1i7yblc7ixmcpfq1lfbyf3jaljvkgrajn70sws9xs7a9f8"))
+            ("tools-namespace-src"
+             ,(lib "tools.namespace/archive/tools.namespace-"
+                   "0.2.11"
+                   "10baak8v0hnwz2hr33bavshm7y49mmn9zsyyms1dwjz45p5ymhy0"))))
+         (library-names (match libraries
+                          (((library-name _) ...)
+                           library-name))))
+    (package
+      (inherit clojure-1.10.0)
+      (version "1.10.3")
+      (source (let ((name+version (string-append "clojure-" version)))
+                  (origin
+                    (method git-fetch)
+                    (uri (git-reference
+                          (url "https://github.com/clojure/clojure")
+                          (commit name+version)))
+                    (file-name (string-append name+version "-checkout"))
+                    (sha256
+                     (base32 "1n83b3lfg1qp790q65nic2ldnk5zwgq9fi3a27c10l1ac7l4f9p0")))))
+      (native-inputs libraries)
+      (arguments
+        (substitute-keyword-arguments (package-arguments clojure-1.10.0)
+          ((#:phases phases)
+           `(modify-phases ,phases
+              (replace 'unpack-library-sources
+                (lambda* (#:key inputs #:allow-other-keys)
+                  (define (extract-library name)
+                    (let ((input-path (assoc-ref inputs name)))
+                      (if (string-suffix? ".jar" input-path)
+                        (copy-recursively input-path (string-append "../" name ".jar"))
+                        (begin
+                          (mkdir-p name)
+                          (with-directory-excursion name
+                            (invoke "tar"
+                                    "--extract"
+                                    "--verbose"
+                                    "--file" input-path
+                                    "--strip-components=1"))
+                          (copy-recursively (string-append name "/src/main/clojure/")
+                                            "src/clj/")))))
+                  (for-each extract-library ',library-names)
+                  #t))
+              (add-after 'unpack-library-sources 'generate-maven-classpath
+                (lambda* (#:key #:allow-other-keys)
+                  ; We require an AOT-compiled spec.alpha.jar on the classpath.
+                  (let ((classpath "../spec-alpha.jar"))
+                    (call-with-output-file "maven-classpath.properties"
+                      (lambda (port)
+                        (display (string-append
+                                   "maven.compile.classpath=" classpath "\n"
+                                   "maven.test.classpath=" classpath "\n")
+                                 port)))
+                    #t)))
+              ; https://clojure.atlassian.net/browse/CLJ-2459
+              ; The clojure package itself does not include bin/clojure.
+              ; This package builds the clojure core library only.
+              ; Use `clojure-tools` for the `clojure` and `clj` binaries.
+              (delete 'make-wrapper))))))))
+
+(define-public clojure clojure-1.10.0)
 
 (define-public clojure-algo-generic
   (package
