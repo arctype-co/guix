@@ -401,7 +401,8 @@ used in the image."
             (file-system (partition-file-system partition)))
         (cond
          ((member 'esp flags) "0xEF")
-         ((string-prefix? "ext" file-system) "0x83")
+         ((or (string-prefix? "ext" file-system)
+              (string=? "btrfs" file-system)) "0x83")
          ((or (string=? file-system "vfat")
               (string=? file-system "fat16")) "0x0E")
          ((string=? file-system "fat32") "0x0C")
@@ -420,7 +421,8 @@ used in the image."
             (file-system (partition-file-system partition)))
         (cond
          ((member 'esp flags) "U")
-         ((string-prefix? "ext" file-system) "L")
+         ((or (string-prefix? "ext" file-system)
+              (string=? "btrfs" file-system)) "L")
          ((or (string=? file-system "vfat")
               (string=? file-system "fat16")
               (string=? file-system "fat32")) "F")
@@ -457,6 +459,8 @@ used in the image."
                                   ((or (string=? type "vfat")
                                        (string-prefix? "fat" type))
                                    (list dosfstools fakeroot mtools))
+                                  ((string=? type "btrfs")
+                                   (list btrfs-progs fakeroot))
                                   (else
                                     '())))
                      (image-root "tmp-root"))

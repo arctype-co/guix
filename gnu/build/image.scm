@@ -131,6 +131,24 @@ turn doesn't take any constant overhead into account, force a 1-MiB minimum."
       (lambda _ (display "")))
     (truncate-file target size)))
 
+(define* (make-btrfs-image partition target root)
+  "Create a Btrfs partition image."
+  (let* ((fs-options (partition-file-system-options partition))
+         (label (partition-label partition))
+         (uuid (partition-uuid partition)))
+  (apply invoke
+         "fakeroot"
+         (string-append "mkfs.btrfs")
+         target
+         "-r" root
+         `(,@(if label
+                 `("-L" ,label)
+                 '())
+           ,@(if uuid
+                 `("-U" ,(uuid->string uuid))
+                 '())
+           ,@fs-options))))
+
 (define* (make-partition-image partition-sexp target root)
   "Create and return the image of PARTITION-SEXP as TARGET.  Use the given
 ROOT directory to populate the image."
@@ -143,6 +161,8 @@ ROOT directory to populate the image."
       (make-vfat-image partition target root 16))
      ((string=? type "fat32")
       (make-vfat-image partition target root 32))
+     ((string=? type "btrfs")
+      (make-btrfs-image partition target root))
      ((string=? type "unformatted")
       (make-unformatted-image partition target))
      (else
