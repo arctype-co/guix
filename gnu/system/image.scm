@@ -462,6 +462,8 @@ used in the image."
                                   ((or (string=? type "vfat")
                                        (string-prefix? "fat" type))
                                    (list dosfstools fakeroot mtools))
+                                  ((string=? type "btrfs")
+                                   (list btrfs-progs fakeroot))
                                   (else
                                     '())))
                      (image-root "tmp-root"))

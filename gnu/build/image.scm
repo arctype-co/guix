@@ -166,6 +166,8 @@ ROOT directory to populate the image."
       (make-vfat-image partition target root 16))
      ((string=? type "fat32")
       (make-vfat-image partition target root 32))
+     ((string=? type "btrfs")
+      (make-btrfs-image partition target root))
      ((string=? type "unformatted")
       (make-unformatted-image partition target))
      (else
