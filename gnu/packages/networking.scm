@@ -5060,14 +5060,17 @@ recording packets that are dropped by the kernel.  It provides the commands
 (define-public bird-1
   (package
     (name "bird")
-    (version "1.6.7")
+    (version "1.6.8")
     (source
       (origin
         (method git-fetch)
         (uri (git-reference
                (url "https://gitlab.nic.cz/labs/bird.git")
-               (commit (string-append "v" version))))
-        (sha256 (base32 "0vbjp42c2zqmcrqcwm4g4fq1v93l6rlk0c27i0k08f3v07w75cih"))))
+               ; Bird: build from `legacy` branch HEAD for GCC 10 patch
+               ; http://trubka.network.cz/pipermail/bird-users/2020-September/014891.html
+               (commit #;(string-append "v" version)
+                       "96fc99f1ee6d68b6f90f68263c628ad8b6bb0b64")))
+        (sha256 (base32 "02r3ccjjqvikc34al2yp9wwkhg5q09v718h8y8n1vsqyisbb1iwm"))))
     (build-system gnu-build-system)
     (arguments
       `(#:tests? #f ;; No tests defined for bird 1
