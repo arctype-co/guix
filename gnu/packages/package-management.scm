@@ -569,6 +569,22 @@ upgrades and roll-backs, per-user profiles, and much more.  It is based on
 the Nix package manager.")
       (license license:gpl3+))))
 
+(define-public arctype-guix
+  (package
+    (inherit guix)
+    (name "arctype-guix")
+    (version "e1c587e5f23fcf76616fccaee39910a941ffd5f3")
+    (source
+      (origin
+        (method git-fetch)
+        (uri (git-reference
+               (url "https://lab.arctype.co/arctype/guix")
+               (commit version)))
+        (sha256
+          (base32
+            "16wsf5dwdlnrz87j9x7fzq78caifsyvwqv2zx3g9jlbzqcc2wk9s"))
+        (file-name (string-append "arctype-guix-" version "-checkout"))))))
+
 (define* (channel-source->package source #:key commit)
   "Return a package for the given channel SOURCE, a lowerable object."
   (package
