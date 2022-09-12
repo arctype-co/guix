@@ -32,7 +32,7 @@
 
 ;; These tests build a whole operating system, which can
 ;; be very slow.
-(define %enable-large-tests? #t)
+(define %enable-large-tests? #f)
 
 ;; Test the (gnu system vm) module.
 
@@ -48,15 +48,15 @@
                     ((os -> (operating-system
                               (inherit %os)
                               (bootloader
-                                (bootloader-configuration 
+                                (bootloader-configuration
                                   (inherit (operating-system-bootloader %os))
                                   (bootloader grub-efi-bootloader)))))
-                     (vm-drv (system-qemu-image/shared-store
+                     (vm-drv (system-qemu-image/shared-store-script
                                os
                                #:system "x86_64-linux"
                                #:target #f
                                #:full-boot? #t
-                               #:partition-label-type "gpt"
+                               #:partition-table-type 'gpt
                                #:disk-image-size (* 2 (expt 2 30)) ; 2 GB
                                #:memory-size 1024))
                      (built? -> (build-derivations %store (list vm-drv))))
@@ -64,7 +64,7 @@
                                 (derivation->output-path vm-drv)
                                 #f)))))))
 
-    (test-assert 
+    (test-assert
       "QEMU image generates a viable output"
       (string? vm-image)))
 
