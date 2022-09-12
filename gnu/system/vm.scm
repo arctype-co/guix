@@ -250,6 +250,7 @@ with '-virtfs' options for the host file systems listed in SHARED-FS."
                                                 (mappings '())
                                                 full-boot?
                                                 (keep-file-systems? #f)
+                                                (partition-table-type 'mbr)
                                                 (disk-image-size
                                                  (* (if full-boot? 500 70)
                                                     (expt 2 20)))
@@ -279,6 +280,7 @@ useful when FULL-BOOT?  is true."
                                         (inherit
                                          (raw-with-offset-disk-image))
                                         (operating-system os)
+                                        (partition-table-type partition-table-type)
                                         (size disk-image-size)
                                         (shared-store?
                                          (and (not full-boot?) volatile?))
