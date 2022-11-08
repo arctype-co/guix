@@ -2564,6 +2564,7 @@ debugging, etc.")
        `(#:make-flags '("-file" "build/build.xml")
          #:test-target "jar-test"
          #:jdk ,icedtea-8
+         #:tests? #f ; Parallel tests are flaky
          #:phases
          (modify-phases %standard-phases
            (add-after 'unpack 'unpack-build-resources
