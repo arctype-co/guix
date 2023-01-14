@@ -64,6 +64,8 @@
 (define-record-type* <cuirass-remote-server-configuration>
   cuirass-remote-server-configuration make-cuirass-remote-server-configuration
   cuirass-remote-server-configuration?
+  (listen           cuirass-remote-server-configuration-listen ;string
+                    (default #f))
   (backend-port     cuirass-remote-server-configuration-backend-port ;int
                     (default 5555))
   (log-port         cuirass-remote-server-configuration-log-port ;int
@@ -201,8 +203,8 @@
         (stop #~(make-kill-destructor)))
       ,@(if remote-server
             (match-record remote-server <cuirass-remote-server-configuration>
-              (backend-port publish-port log-file log-expiry cache publish?
-                            trigger-url public-key private-key)
+              (listen backend-port publish-port log-file log-expiry cache
+                      publish? trigger-url public-key private-key)
               (list
                (shepherd-service
                 (documentation "Run Cuirass remote build server.")
@@ -217,6 +219,11 @@
                                 (string-append "--log-expiry="
                                                #$(number->string log-expiry)
                                                "s")
+                                #$@(if listen
+                                       (list (string-append
+                                              "--listen="
+                                              listen))
+                                       '())
                                 #$@(if backend-port
                                        (list (string-append
                                               "--backend-port="
@@ -358,6 +365,8 @@
                     (default #f))
   (systems          cuirass-remote-worker-systems ;list
                     (default (list (%current-system))))
+  (listen           cuirass-remote-worker-listen ;string
+                    (default #f))
   (log-file         cuirass-remote-worker-log-file ;string
                     (default "/var/log/cuirass-remote-worker.log"))
   (publish-port     cuirass-remote-worker-configuration-publish-port ;int
@@ -373,7 +382,7 @@
   "Return a <shepherd-service> for the Cuirass remote worker service with
 CONFIG."
   (match-record config <cuirass-remote-worker-configuration>
-    (cuirass workers server systems log-file publish-port
+    (cuirass workers server systems listen log-file publish-port
              substitute-urls public-key private-key)
     (list (shepherd-service
            (documentation "Run Cuirass remote build worker.")
@@ -384,6 +393,9 @@ CONFIG."
                            "remote-worker"
                            (string-append "--workers="
                                           #$(number->string workers))
+                           #$@(if listen
+                                  (list (string-append "--listen=" listen))
+                                  '())
                            #$@(if server
                                   (list (string-append "--server=" server))
                                   '())
