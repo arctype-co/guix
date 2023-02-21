@@ -144,6 +144,7 @@
             CLONE_NEWPID
             CLONE_NEWNET
             clone
+            clone3
             setns
 
             PF_PACKET
@@ -1141,6 +1142,61 @@ are shared between the parent and child processes."
                            %null-pointer))))           ;unused
         (if (= ret -1)
             (throw 'system-error "clone" "~d: ~A"
+                   (list flags (strerror err))
+                   (list err))
+            ret)))))
+
+;; List of types in a struct clone_args.
+(define %struct-clone-args
+  (list uint64 uint64 uint64 uint64 uint64 uint64 uint64 uint64 uint64 uint64 uint64))
+
+;; Build a struct clone_args for clone3 system calls. Returns pointer and size.
+(define (clone-args flags pidfd child-tid parent-tid exit-signal stack
+                    stack-size tls set-tid set-tid-size cgroup)
+  ;; struct clone_args
+  ;; https://github.com/torvalds/linux/blob/master/include/uapi/linux/sched.h
+	;;__aligned_u64 flags;
+	;;__aligned_u64 pidfd;
+	;;__aligned_u64 child_tid;
+	;;__aligned_u64 parent_tid;
+	;;__aligned_u64 exit_signal;
+	;;__aligned_u64 stack;
+	;;__aligned_u64 stack_size;
+	;;__aligned_u64 tls;
+	;;__aligned_u64 set_tid;
+	;;__aligned_u64 set_tid_size;
+	;;__aligned_u64 cgroup;
+  (make-c-struct %struct-clone-args
+                 (list flags pidfd child-tid parent-tid exit-signal stack
+                       stack-size tls set-tid set-tid-size cgroup)))
+
+(define clone3
+  (let* ((proc (syscall->procedure int "syscall"
+                                   (list long                   ;sysno
+                                         '*                     ;struct clone_args*
+                                         size_t)))
+         ;; Unline clone, clone3 has a consistent syscall id across all architectures.
+         (syscall-id 435))
+    (lambda* (#:key
+              (flags 0) (pidfd 0) (child-tid 0) (parent-tid 0) (exit-signal 0) (stack 0)
+              (stack-size 0) (tls 0) (set-tid 0) (set-tid-size 0) (cgroup 0))
+      "Create a new child process by duplicating the current parent process.
+The newer clone3 system call provides more functionality than the clone interface.
+clone3 accepts keyword arguments which map to parameters in struct clone_args (see include/uapi/linux/sched.h)."
+      (let-values (((ret err)
+                    ;; Guile 2.2 runs a finalization thread.  'primitive-fork'
+                    ;; takes care of shutting it down before forking, and we
+                    ;; must do the same here.  Failing to do that, if the
+                    ;; child process calls 'primitive-fork', it will hang
+                    ;; while trying to pthread_join the finalization thread
+                    ;; since that thread does not exist.
+                    (without-automatic-finalization
+                     (proc syscall-id
+                           (clone-args flags pidfd child-tid parent-tid exit-signal stack
+                                       stack-size tls set-tid set-tid-size cgroup)
+                           (sizeof %struct-clone-args)))))
+        (if (= ret -1)
+            (throw 'system-error "clone3" "~d: ~A"
                    (list flags (strerror err))
                    (list err))
             ret)))))

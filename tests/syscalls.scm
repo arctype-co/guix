@@ -151,6 +151,21 @@
 
 (unless perform-container-tests?
   (test-skip 1))
+(test-assert "clone3"
+  (match (clone3
+           #:flags (logior CLONE_NEWUSER)
+           #:exit-signal SIGCHLD)
+    (0 (primitive-exit 42))
+    (pid
+     ;; Check if user namespaces are different.
+     (and (not (equal? (readlink (user-namespace pid))
+                       (readlink (user-namespace (getpid)))))
+          (match (waitpid pid)
+            ((_ . status)
+             (= 42 (status:exit-val status))))))))
+
+(unless perform-container-tests?
+  (test-skip 1))
 (test-assert "setns"
   (match (clone (logior CLONE_NEWUSER SIGCHLD))
     (0 (primitive-exit 0))
