@@ -1,0 +1,3 @@
+#!/bin/sh
+exec guix environment --pure guix --ad-hoc guile-colorized guile-readline -- \
+  ./pre-inst-env guile $@
