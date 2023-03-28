@@ -9602,7 +9602,7 @@ headers.")
 (define-public bcc
   (package
     (name "bcc")
-    (version "0.24.0")
+    (version "0.26.0")
     (source
      (origin
        (method git-fetch)
@@ -9612,13 +9612,13 @@ headers.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "1i6xikkxf2nasfkqa91hjzdq0a88mgyzrvia4fi2i2v1d8pbmnp4"))))
+         "1czcx31fv7lapr72nzdxqb5c3nr6g79l8s8zlwx6bf1fzjsgq7fg"))))
     (build-system cmake-build-system)
     (native-inputs
      (list bison flex))
     (inputs
-     `(("clang-toolchain" ,clang-toolchain-9)
-       ("libbpf" ,(package-source libbpf))
+     `(("clang-toolchain" ,clang-toolchain-14)
+       ("libbpf" ,libbpf)
        ;; LibElf required but libelf does not contain
        ;; archives, only object files.
        ;; https://github.com/iovisor/bcc/issues/504
@@ -9630,16 +9630,12 @@ headers.")
        #:tests? #f
        #:configure-flags
        (let ((revision ,version))
-         `(,(string-append "-DREVISION=" revision)))
+         `(,(string-append "-DREVISION=" revision)
+            "-DCMAKE_USE_LIBBPF_PACKAGE=ON"
+            "-DENABLE_EXAMPLES=OFF"))
        #:phases
        (modify-phases %standard-phases
-         ;; FIXME: Use "-DCMAKE_USE_LIBBPF_PACKAGE=ON".
-         (add-after 'unpack 'copy-libbpf
-           (lambda* (#:key inputs #:allow-other-keys)
-             (delete-file-recursively "src/cc/libbpf")
-             (copy-recursively
-              (assoc-ref inputs "libbpf") "src/cc/libbpf")))
-         (add-after 'copy-libbpf 'substitute-libbc
+         (add-after 'unpack 'substitute-libbc
            (lambda* (#:key outputs #:allow-other-keys)
              (substitute* "src/python/bcc/libbcc.py"
                (("(libbcc\\.so.*)\\b" _ libbcc)
