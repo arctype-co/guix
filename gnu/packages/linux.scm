@@ -843,7 +843,8 @@ ARCH and optionally VARIANT, or #f if there is no such configuration."
     ;; Debugging options.
     ("CONFIG_DEBUG_INFO" . #t)          ;required by BTF
     ,@(if (version>=? version "5.1")
-          '(("CONFIG_DEBUG_INFO_BTF" . #t))
+          '(("CONFIG_DEBUG_INFO_BTF" . #t)
+            ("CONFIG_DEBUG_INFO_BTF_MODULES" . #t))
           '())
     ,@(if (version>=? version "5.12")
           '(("CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT" . #t))
