@@ -877,6 +877,9 @@ ARCH and optionally VARIANT, or #f if there is no such configuration."
     ;; optional, for tc actions
     ("CONFIG_NET_ACT_BPF" . m)
     ("CONFIG_BPF_JIT" . #t)
+    ;; Type metadata for tracing
+    ("CONFIG_DEBUG_INFO_BTF" . #t)
+    ("CONFIG_DEBUG_INFO_BTF_MODULES" . #t)
     ;; for Linux kernel versions 4.1 through 4.6
     ;; ("CONFIG_HAVE_BPF_JIT" . y)
     ;; for Linux kernel versions 4.7 and later
