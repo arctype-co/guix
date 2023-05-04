@@ -1,0 +1,33 @@
+From 7b9712019c091e1a47bdd5b5ad390f663ac98ec5 Mon Sep 17 00:00:00 2001
+From: Ryan Sundberg <ryan@arctype.co>
+Date: Wed, 3 May 2023 22:03:35 -0700
+Subject: [PATCH] maven: Add support for `maven.repo.local` system property
+
+When the `maven.repo.local` property is set, prefer that for determining
+the default local repository.
+
+This is an [undocumented](https://stackoverflow.com/a/9124827) but
+well-known system property used to override the location of the local
+maven repository without using a settings.xml.
+---
+ src/main/clojure/clojure/tools/deps/util/maven.clj | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/main/clojure/clojure/tools/deps/util/maven.clj b/src/main/clojure/clojure/tools/deps/util/maven.clj
+index e1c9985..7f79d16 100644
+--- a/src/main/clojure/clojure/tools/deps/util/maven.clj
++++ b/src/main/clojure/clojure/tools/deps/util/maven.clj
+@@ -170,7 +170,9 @@
+   "Helper to form the path to the default local repo - use `@cached-local-repo` for
+   caching delayed value"
+   []
+-  (.getAbsolutePath (jio/file (System/getProperty "user.home") ".m2" "repository")))
++  (.getAbsolutePath
++    (or (some-> (System/getProperty "maven.repo.local") (jio/file))
++        (jio/file (System/getProperty "user.home") ".m2" "repository"))))
+ 
+ (def default-local-repo
+   "DEPRECATED - use `@cached-local-repo`"
+-- 
+2.37.2
+
