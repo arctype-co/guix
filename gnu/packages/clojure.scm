@@ -216,14 +216,14 @@ designs.")
 (define-public clojure-tools
   (package
     (name "clojure-tools")
-    (version "1.11.1.1165")
+    (version "1.11.1.1273")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://download.clojure.org/install/clojure-tools-"
                            version
                            ".tar.gz"))
-       (sha256 (base32 "1lg97waqfcgzr3dz5426fbc4kqcsavpbqil2iyjm1dw3zrfa8ysi"))
+       (sha256 (base32 "1rhcwkq3h3kpk5qkh3wfxgc9wg09p3kshq5ypk4ql55x4k7sz2sz"))
        ;; Remove AOT compiled JAR.  The other JAR only contains uncompiled
        ;; Clojure source code.
        (snippet
@@ -250,7 +250,7 @@ designs.")
              (substitute* "clj"
                (("BINDIR") (string-append (assoc-ref outputs "out") "/bin"))
                (("rlwrap") (which "rlwrap")))))
-         (add-after 'fix-paths 'copy-tools-deps-alpha-jar
+         (add-after 'fix-paths 'copy-tools-deps-jar
            (lambda* (#:key inputs outputs #:allow-other-keys)
              (substitute* "clojure"
                (("\\$install_dir/libexec/clojure-tools-\\$version\\.jar")
@@ -262,7 +262,7 @@ designs.")
                  ":"))))))))
     (inputs (list rlwrap
                   clojure
-                  clojure-tools-deps-alpha
+                  clojure-tools-deps
                   java-commons-logging-minimal))
     (home-page "https://clojure.org/releases/tools")
     (synopsis "CLI tools for the Clojure programming language")
