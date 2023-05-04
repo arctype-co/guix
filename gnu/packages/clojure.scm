@@ -1002,7 +1002,7 @@ dependency graph expansion and the creation of classpaths.")
 (define-public clojure-tools-gitlibs
   (package
     (name "clojure-tools-gitlibs")
-    (version "2.4.181")
+    (version "2.5.190")
     (home-page "https://github.com/clojure/tools.gitlibs")
     (source (origin
               (method git-fetch)
@@ -1012,7 +1012,7 @@ dependency graph expansion and the creation of classpaths.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1d8c79f33axghadwqa955yjfsxa6fgl8jq4nfll2zrp6sjw0597k"))))
+                "1h930x9q5h37l0yrsyr4zqd2pf5dsp7zjydgqvw3yb4m6hd0nw02"))))
     (build-system clojure-build-system)
     (arguments
      '(#:source-dirs '("src/main/clojure")
