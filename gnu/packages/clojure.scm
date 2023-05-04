@@ -851,16 +851,16 @@ tools.analyzer, providing additional JVM-specific passes.")
 (define-public clojure-tools-cli
   (package
     (name "clojure-tools-cli")
-    (version "1.0.206")
+    (version "1.0.214")
     (home-page "https://github.com/clojure/tools.cli")
     (source (origin
               (method git-fetch)
               (uri (git-reference
                     (url home-page)
-                    (commit (string-append "tools.cli-" version))))
+                    (commit (string-append "v" version))))
               (file-name (git-file-name name version))
               (sha256
-               (base32 "1hvk5zacl3fr8lfcbfgckaicqjx697j0kzw2x5hwj8j5xlr8ri2r"))))
+               (base32 "00728cwd4hl600r3d6gpffx7sg8wmgg3qlbx8sm7n5sp4q07kix1"))))
     (build-system clojure-build-system)
     (arguments
      '(#:source-dirs '("src/main/clojure/")
