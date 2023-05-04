@@ -999,6 +999,51 @@ dependency graph expansion and the creation of classpaths.")
 dependency graph expansion and the creation of classpaths.")
     (license license:epl1.0)))
 
+(define-public clojure-tools-deps
+  (package
+    (inherit clojure-tools-deps-alpha)
+    (name "clojure-tools-deps")
+    (version "0.18.1335")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/clojure/tools.deps")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1jx0s1k843vqvgbb2j54ycn1gxdha2c02018kcm5pda4h2riy6km"))))
+    (arguments
+     `(#:source-dirs '("src/main/clojure" "src/main/resources")
+       #:test-dirs '("src/test/clojure")
+       #:doc-dirs '()
+       ;; FIXME: Could not initialize class org.eclipse.aether.transport.http.SslSocketFactory
+       #:tests? #f
+       #:phases
+       (modify-phases %standard-phases
+         ;; FIXME: Currently, the S3 transporter depends on ClojureScript,
+         ;; which is very difficult to package due to dependencies on Java
+         ;; libraries with non-standard build systems. Instead of actually
+         ;; packaging these libraries, we just remove the S3 transporter that
+         ;; depends on them.
+         (add-after 'unpack 'remove-s3-transporter
+           (lambda _
+             (for-each delete-file
+                       (list
+                        (string-append
+                         "src/main/clojure/clojure/"
+                         "tools/deps/util/s3_aws_client.clj")
+                        (string-append
+                         "src/main/clojure/clojure/"
+                         "tools/deps/util/s3_transporter.clj")
+                        (string-append
+                         "src/test/clojure/clojure/"
+                         "tools/deps/util/test_s3_transporter.clj")))
+             (substitute*
+                 "src/main/clojure/clojure/tools/deps/util/maven.clj"
+               (("clojure.tools.deps.util.s3-transporter")
+                "")))))))))
+
 (define-public clojure-tools-gitlibs
   (package
     (name "clojure-tools-gitlibs")
