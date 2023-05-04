@@ -1010,6 +1010,7 @@ dependency graph expansion and the creation of classpaths.")
                     (url "https://github.com/clojure/tools.deps")
                     (commit (string-append "v" version))))
               (file-name (git-file-name name version))
+              (patches (search-patches "clojure-tools-deps-maven-repo-local.patch"))
               (sha256
                (base32
                 "1jx0s1k843vqvgbb2j54ycn1gxdha2c02018kcm5pda4h2riy6km"))))
