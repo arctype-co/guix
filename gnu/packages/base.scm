@@ -534,7 +534,11 @@ used to apply commands with arbitrarily long arguments.")
                                ;; there might be some environmental factor
                                ;; here
                                ((" test-tls\\$\\(EXEEXT\\) ") " ")))
-                           '())
+                           '((substitute*
+                               ;; This test fails on BTRFS
+                               '("tests/cp/reflink-auto.sh")
+                               (("^#!.*" all)
+                                (string-append all "exit 77;\n")))))
                      (substitute* "Makefile.in"
                        ;; fails on filesystems where inotify cannot be used,
                        ;; more info in #47935
