@@ -6097,7 +6097,8 @@ Linux Device Mapper multipathing driver:
               (sha256
                (base32
                 "02r0g2vfv6kfljplm3ga93w4xw13q2wixbn9hwi7ahqdzp2x2i1c"))
-              (patches (search-patches "libaio-32bit-test.patch"))))
+              (patches (search-patches "libaio-32bit-test.patch"
+                                       "libaio-btrfs-test.patch"))))
     (build-system gnu-build-system)
     (arguments
      (list #:make-flags
