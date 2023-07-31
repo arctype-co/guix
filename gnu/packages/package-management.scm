@@ -562,16 +562,16 @@ the Nix package manager.")
   (package
     (inherit guix)
     (name "arctype-guix")
-    (version "e1c587e5f23fcf76616fccaee39910a941ffd5f3")
+    (version "0d1475998bfddcf4200274ec83de545652c0ce28")
     (source
       (origin
         (method git-fetch)
         (uri (git-reference
-               (url "https://lab.arctype.co/arctype/guix")
+               (url "https://github.com/arctype-co/guix")
                (commit version)))
         (sha256
           (base32
-            "1aslbzib0n269vi4y6a73wx6cnijqvrm9856ycm4754cnq9xjcwz"))
+            "04ns4h0dckac6kzrh8ziry77fw4nlibwgx31q97b909dmnrlqiqg"))
         (file-name (string-append "arctype-guix-" version "-checkout"))))
     (arguments
      (substitute-keyword-arguments (package-arguments guix)
