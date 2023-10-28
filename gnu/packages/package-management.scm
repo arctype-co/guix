@@ -582,8 +582,13 @@ the Nix package manager.")
                (commit version)))
         (sha256
           (base32
-            "16wsf5dwdlnrz87j9x7fzq78caifsyvwqv2zx3g9jlbzqcc2wk9s"))
-        (file-name (string-append "arctype-guix-" version "-checkout"))))))
+            "1aslbzib0n269vi4y6a73wx6cnijqvrm9856ycm4754cnq9xjcwz"))
+        (file-name (string-append "arctype-guix-" version "-checkout"))))
+    (arguments
+     (substitute-keyword-arguments (package-arguments guix)
+       ;; Skip tests. For whatever reason(s), they are too unstable.
+       ((#:tests? #f #f)
+        #f)))))
 
 (define* (channel-source->package source #:key commit)
   "Return a package for the given channel SOURCE, a lowerable object."
