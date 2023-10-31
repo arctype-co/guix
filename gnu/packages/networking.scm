@@ -88,6 +88,7 @@
   #:use-module (guix download)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
+  #:use-module ((guix build python-build-system) #:select (add-installed-pythonpath))
   #:use-module (guix build-system cmake)
   #:use-module (guix build-system glib-or-gtk)
   #:use-module (guix build-system gnu)
@@ -141,15 +142,18 @@
   #:use-module (gnu packages graphviz)
   #:use-module (gnu packages gstreamer)
   #:use-module (gnu packages gtk)
+  #:use-module (gnu packages haskell-xyz)
   #:use-module (gnu packages image)
   #:use-module (gnu packages kde-frameworks)
   #:use-module (gnu packages libbsd)
   #:use-module (gnu packages libevent)
+  #:use-module (gnu packages libffi)
   #:use-module (gnu packages libidn)
   #:use-module (gnu packages libusb)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages lua)
   #:use-module (gnu packages kerberos)
+  #:use-module (gnu packages m4)
   #:use-module (gnu packages man)
   #:use-module (gnu packages mpi)
   #:use-module (gnu packages ncurses)
@@ -2979,6 +2983,99 @@ IPFIX, RSPAN, CLI, LACP, 802.1ag).")
            license:gpl2                 ; datapath
            license:bsd-2 license:bsd-3
            license:asl2.0))))           ; all other
+
+(define-public netplan
+  (package
+    (name "netplan")
+    (version "0.107-git")
+    (home-page "https://netplan.io")
+    (source
+      (origin
+        (method git-fetch)
+        (uri (git-reference
+               ;(url "https://github.com/canonical/netplan.git")
+               (url "https://lab.arctype.co/arctype/netplan.git")
+               (commit "406378d754baf73eed2badaede3027d287e4568f")))
+        (sha256
+          (base32
+            "05041q6l8jss2pcs98b01vhwi532ggh63qhmdqb6gyahq1xh2abd"))))
+    (build-system meson-build-system)
+    (arguments
+      `(#:configure-flags '("-Denable_completions=false" "-Denable_systemd=false")
+        #:imported-modules ((guix build python-build-system)
+                            ,@%meson-build-system-modules)
+        #:modules (((guix build python-build-system) #:prefix python:)
+                   (guix build meson-build-system)
+                   (guix build utils)
+                   ((srfi srfi-1) #:select (append-map)))
+        #:tests? #f ; Tests require /sys fs and running NetworkManager on lo
+        #:phases (modify-phases %standard-phases
+                   (replace 'configure
+                     (lambda* (#:key outputs configure-flags build-type #:allow-other-keys)
+                       (let* ((out (assoc-ref outputs "out"))
+                              (source-dir (getcwd))
+                              (build-dir "../build")
+                              (prefix (assoc-ref outputs "out"))
+                              (args `(,(string-append "--prefix=" prefix)
+                                      ,(string-append "--buildtype=" build-type)
+                                      ,(string-append "-Dc_link_args=-Wl,-rpath="
+                                                      (assoc-ref outputs "out") "/lib")
+                                      ,(string-append "-Dcpp_link_args=-Wl,-rpath="
+                                                      (assoc-ref outputs "out") "/lib")
+                                      ,(string-append "-Dpythonpath=" (getenv "GUIX_PYTHONPATH"))
+                                      ,@configure-flags
+                                      ,source-dir)))
+
+                         (mkdir build-dir)
+                         (chdir build-dir)
+                         (apply invoke "meson" "setup" args))))
+                   (add-after 'install 'install-completions
+                     (lambda* (#:key outputs #:allow-other-keys)
+                       (let* ((out (assoc-ref outputs "out"))
+                              (completions (string-append out "/etc/bash_completion.d")))
+                         (install-file "../source/netplan.completions" completions))))
+                   (add-after 'install 'wrap-program
+                     (lambda* (#:key inputs outputs #:allow-other-keys)
+                              (let* ((out (assoc-ref outputs "out"))
+                                     (eudev (assoc-ref inputs "eudev"))
+                                     (iproute (assoc-ref inputs "iproute2"))
+                                     (network-manager (assoc-ref inputs "network-manager"))
+                                     (openvswitch (assoc-ref inputs "openvswitch"))
+                                     (site-packages (python:site-packages inputs
+                                                                          outputs)))
+                                (wrap-program (string-append out "/sbin/netplan")
+                                              `("GUIX_PYTHONPATH" prefix
+                                                (,site-packages ,(getenv "GUIX_PYTHONPATH")))
+                                              `("NETPLAN_GENERATE_PATH" prefix
+                                                (,(string-append out "/libexec/netplan/generate")))
+                                              `("PATH" ":" prefix
+                                                ,(append-map
+                                                   (lambda (dir)
+                                                     (list
+                                                       (string-append dir "/bin")
+                                                       (string-append dir "/sbin")))
+                                                   (list eudev iproute network-manager openvswitch)))))))
+                   (add-after 'validate-runpath 'install-udev-rules
+                     (lambda* (#:key outputs #:allow-other-keys)
+                       (let* ((out (assoc-ref outputs "out")))
+                         (mkdir-p (string-append out "/lib/udev/rules.d"))
+                         ;; Netplan will write generated rules here
+                         (symlink "/run/udev/rules.d/90-netplan.rules"
+                                  (string-append out "/lib/udev/rules.d/90-netplan.rules"))))))))
+    (inputs
+      (list dbus eudev glib iproute libsystemd libyaml network-manager openvswitch python))
+    (native-inputs
+      (list bash-completion cmocka findutils m4 pkg-config pandoc python-pycodestyle python-coverage
+            python-pyflakes python-pytest python-pytest-cov))
+    (propagated-inputs
+      (list python-cffi python-dbus python-netifaces python-pyyaml))
+    (synopsis "Declarative network configuration")
+    (description "Netplan is a utility for easily configuring networking on a linux
+system. You simply create a YAML description of the required network
+interfaces and what each should be configured to do. From this
+description Netplan will generate all the necessary configuration
+for your chosen renderer tool.")
+    (license license:gpl3)))
 
 (define-public python-ipy
   (package
