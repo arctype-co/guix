@@ -761,6 +761,49 @@ other applications that need to directly deal with input devices.")
                "-Ddebug-gui=false"    ;requires gtk+@3
                ,flags))))))
 
+(define-public libsystemd
+  (package
+    (name "libsystemd")
+    (version "256.9")
+    (source
+      (origin
+        (method git-fetch)
+        (uri
+          (git-reference
+            (url "https://github.com/systemd/systemd.git")
+            (commit (string-append "v" version))))
+        (sha256
+          (base32
+            "0x7n2jwmwrprl0aqcaxw184r5x03047264ccrv24aivmf5fzk7iy"))))
+    (build-system meson-build-system)
+    (arguments
+      `(;; Don't test all of systemd
+        #:tests? #f
+        #:configure-flags (list (string-append "-Drootprefix=" %output))
+        #:phases (modify-phases %standard-phases
+                   (replace 'build
+                     (lambda* (#:key parallel-build? #:allow-other-keys)
+                       (invoke "ninja"
+                               "-j" (if parallel-build? (number->string (parallel-job-count)) "1")
+                               "libsystemd.so.0.39.0"
+                               "src/libsystemd/libsystemd.pc")))
+                   (replace 'install
+                     (lambda* (#:key outputs #:allow-other-keys)
+                       (invoke "meson" "install" "--no-rebuild" "--tags" "libsystemd")
+                       (let ((out (assoc-ref outputs "out")))
+                         (delete-file "../source/src/systemd/meson.build")
+                         (mkdir-p (string-append out "/lib/pkgconfig"))
+                         (install-file "./src/libsystemd/libsystemd.pc" (string-append out "/lib/pkgconfig"))
+                         (copy-recursively "../source/src/systemd" (string-append out "/include/systemd"))))))))
+    (inputs
+      (list gperf libcap libxcrypt (list util-linux "lib")))
+    (native-inputs
+      (list cmake pkg-config python python-jinja2))
+    (home-page "https://systemd.io/")
+    (synopsis "Functions for implementing services and interacting with systemd")
+    (description "The libsystemd library provides functions that allow interacting with various interfaces provided by the systemd(1) service manager, as well as various other functions and constants useful for implementing services in general.")
+    (license license:lgpl2.1+)))
+
 (define-public libxdg-basedir
   (package
     (name "libxdg-basedir")
