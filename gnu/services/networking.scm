@@ -1258,6 +1258,9 @@ project's documentation} for more information."
                         (default '(wpa-supplicant)))
   (dns network-manager-configuration-dns
        (default "default"))
+  ;; Extra arguments to pass to the NetworkManager daemon
+  (extra-options network-manager-configuration-extra-options
+                 (default '()))
   (vpn-plugins network-manager-configuration-vpn-plugins ;list of file-like
                (default '()))
   (iwd? network-manager-configuration-iwd?  ; TODO: deprecated field, remove.
@@ -1318,7 +1321,7 @@ project's documentation} for more information."
 
 (define (network-manager-shepherd-service config)
   (match-record config <network-manager-configuration>
-    (network-manager shepherd-requirement dns vpn-plugins iwd?)
+    (network-manager shepherd-requirement dns extra-options vpn-plugins iwd?)
     (let* ((iwd? (or iwd?  ; TODO: deprecated field, remove later.
                      (and shepherd-requirement
                           (memq 'iwd shepherd-requirement))))
@@ -1343,7 +1346,8 @@ project's documentation} for more information."
                           (list #$(file-append network-manager
                                                "/sbin/NetworkManager")
                                 (string-append "--config=" #$conf)
-                                "--no-daemon")
+                                "--no-daemon"
+                                #$@extra-options)
                           #:environment-variables
                           (list (string-append "NM_VPN_PLUGIN_DIR=" #$vpn
                                                "/lib/NetworkManager/VPN")
