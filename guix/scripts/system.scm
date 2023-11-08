@@ -91,7 +91,8 @@
   #:use-module (rnrs bytevectors)
   #:export (guix-system
             read-operating-system
-
+            export-extension-graph
+            export-shepherd-graph
             service-node-type
             shepherd-service-node-type))
 
