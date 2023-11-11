@@ -178,7 +178,7 @@ Python without keeping their credentials in a Docker configuration file.")
 (define-public containerd
   (package
     (name "containerd")
-    (version "1.6.22")
+    (version "1.7.8")
     (source
      (origin
        (method git-fetch)
@@ -187,7 +187,7 @@ Python without keeping their credentials in a Docker configuration file.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1m31y00sq2m76m1jiq4znws8gxbgkh5adklvqibxiz1b96vvwjk8"))
+        (base32 "1cw8z4gxz097hiqlc7pfvxgrs9y6kgwnv12i216ld2zlj0falpm7"))
        (patches
         (search-patches "containerd-create-pid-file.patch"))))
     (build-system go-build-system)
@@ -198,6 +198,7 @@ Python without keeping their credentials in a Docker configuration file.")
                                "REVISION=0")))
        (list
         #:import-path "github.com/containerd/containerd"
+        #:go go-1.20
         #:phases
         #~(modify-phases %standard-phases
             (add-after 'unpack 'patch-paths
@@ -249,7 +250,7 @@ Python without keeping their credentials in a Docker configuration file.")
     (inputs
      (list btrfs-progs libseccomp pigz runc util-linux))
     (native-inputs
-     (list go pkg-config))
+     (list go-1.20 pkg-config))
     (synopsis "Docker container runtime")
     (description "This package provides the container daemon for Docker.
 It includes image transfer and storage, container execution and supervision,
