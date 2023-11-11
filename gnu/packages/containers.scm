@@ -53,10 +53,10 @@
   #:use-module (gnu packages wget))
 
 (define-public crun
-  (let ((commit "c381048530aa750495cf502ddb7181f2ded5b400"))
+  (let ((commit "ab0edeef1c331840b025e8f1d38090cfb8a0509d"))
     (package
       (name "crun")
-      (version "1.4.5")
+      (version "1.11.2")
       (source
        (origin
          (method git-fetch)
@@ -65,7 +65,7 @@
                (commit commit)
                (recursive? #t)))
          (sha256
-          (base32 "0x2xmr5sv9ivvcv5fl5jjk4kq9b3n97s5hsqiqfwl4rz8qcz4xk1"))
+          (base32 "0d9mw6j5pq025vllxaxysp2d36jq47iz6f1py43z30wydzm1iqqw"))
          (file-name (git-file-name name version))))
       (build-system gnu-build-system)
       (arguments
