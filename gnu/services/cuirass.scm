@@ -197,6 +197,9 @@
                                '())
                         #$@extra-options)
 
+                  #:environment-variables
+                  (list (string-append "CUIRASS_STATE_DIRECTORY=" #$state-directory))
+
                   #:user #$user
                   #:group #$group
                   #:log-file #$web-log-file))
