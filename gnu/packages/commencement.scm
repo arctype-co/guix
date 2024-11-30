@@ -73,7 +73,8 @@
   #:use-module (guix utils)
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 vlist)
-  #:use-module (ice-9 match))
+  #:use-module (ice-9 match)
+  #:export (make-gcc-toolchain))
 
 ;;; Commentary:
 ;;;
