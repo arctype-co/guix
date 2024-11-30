@@ -556,6 +556,7 @@ expressions, and its ability to generate emacs-style TAGS files.")
      '(#:test-target "test"
        #:make-flags (list (string-append "PREFIX="
                                          (assoc-ref %outputs "out")))
+       #:parallel-tests? #f
        #:phases
        (modify-phases %standard-phases
          (add-after 'unpack 'patch-references-to-commands
