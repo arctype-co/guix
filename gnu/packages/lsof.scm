@@ -75,7 +75,10 @@
                       prefix)
                      ;; Fails because /proc not mounted in sandbox
                      (("\tdialects/linux/tests/case-20-epoll.bash \\\\")
-                      "\\")))))))
+                      "\\")))))
+           ;; Skip tests, which fail on btrfs.
+           ;; https://github.com/lsof-org/lsof/issues/152
+           #:tests? #f))
     (synopsis "Display information about open files")
     (description
      "Lsof stands for LiSt Open Files, and it does just that.
